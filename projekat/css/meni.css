@@ -21,18 +21,31 @@ li a {
     display: block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding-top: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
     text-decoration: none;
+    transition: color 0s linear;
 }
 
 li a:hover {
-    color: #ff9900;
+    color: #333;
+    font-size: 0%;
 }
 
-li img {
+li a:hover img {
+    transform: scale(2.7);
+    top: 14px;
+}
+
+li a img {
     width: 20px;
     height: 20px;
     display: block;
     padding-bottom: 14px;
-    padding-left: 16px;
+    padding-top: 10px;
+    transition: transform 1s linear;
+    margin: 0 auto;
+    position: relative;
 }
+
