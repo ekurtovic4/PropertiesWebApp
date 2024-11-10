@@ -26,6 +26,11 @@ li a {
     padding-right: 16px;
     text-decoration: none;
     transition: color 0s linear;
+    min-width: 65px;
+    height: 63px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
 }
 
 li a:hover {
@@ -45,7 +50,6 @@ li a img {
     padding-bottom: 14px;
     padding-top: 10px;
     transition: transform 1s linear;
-    margin: 0 auto;
     position: relative;
 }
 
