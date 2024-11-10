@@ -12,7 +12,7 @@ body h3 {
 iframe {
   border: none; 
   width: 100%;
-  height: 50px;
+  height: fit-content;
 }
 
 /* Stil za div #osnovno */
@@ -74,7 +74,7 @@ iframe {
   background-color: white;
 }
 
-@media only screen and (width > 800px) {
+@media only screen and (min-width : 800px) {
   #upiti {
     display: flex;
   }
@@ -86,6 +86,24 @@ iframe {
   }
 }
 
+.nazad-button {
+  display: none;
+}
 
+.naprijed-button {
+  display: none;
+}
 
+@media only screen and (max-width : 600px) {
+  #upiti .upit {
+    display: none;
+  }
 
+  #upiti .upit-prikazi {
+    display: block;
+  }
+
+  .nazad-button, .naprijed-button {
+    display: inline-block;
+  }
+}
