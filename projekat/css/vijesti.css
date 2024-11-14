@@ -17,6 +17,13 @@ iframe {
     grid-template-columns: repeat(4, 1fr);
     width: 100%;
     border: 1px solid black;
+    grid-template-areas: 
+        'gv gv gv gv'
+        'gv gv gv gv'
+        'vv1 kv1 kv2 vv2'
+        'vv1 kv3 kv4 vv2'
+        'kv5 kv6 vv3 vv4'
+        'kv7 kv8 vv3 vv4';
 }
 
 .glavnaVijest {
@@ -29,6 +36,7 @@ iframe {
     flex-direction: row;
     overflow-y: auto;
     box-sizing: border-box;
+    grid-area: gv;
 }
 
 .visokaVijest {
@@ -42,6 +50,22 @@ iframe {
     box-sizing: border-box;
 }
 
+.vv1 {
+    grid-area: vv1;
+}
+
+.vv2 {
+    grid-area: vv2;
+}
+
+.vv3 {
+    grid-area: vv3;
+}
+
+.vv4 {
+    grid-area: vv4;
+}
+
 .kvadratnaVijest {
     aspect-ratio: 1;
     background-color: pink;
@@ -51,6 +75,38 @@ iframe {
     overflow: hidden;
     overflow-y: auto;
     box-sizing: border-box;
+}
+
+.kv1 {
+    grid-area: kv1;
+}
+
+.kv2 {
+    grid-area: kv2;
+}
+
+.kv3 {
+    grid-area: kv3;
+}
+
+.kv4 {
+    grid-area: kv4;
+}
+
+.kv5 {
+    grid-area: kv5;
+}
+
+.kv6 {
+    grid-area: kv6;
+}
+
+.kv7 {
+    grid-area: kv7;
+}
+
+.kv8 {
+    grid-area: kv8;
 }
 
 h2, h3, h4 {
@@ -76,6 +132,17 @@ p {
 @media only screen and (max-width : 800px) {
     #vijesti {
         grid-template-columns: repeat(2, 1fr);
+        grid-template-areas: 
+        'gv gv'
+        'gv gv'
+        'vv1 kv1'
+        'vv1 kv3'
+        'kv2 vv2'
+        'kv4 vv2'
+        'kv5 kv6'
+        'kv7 kv8'
+        'vv3 vv4'
+        'vv3 vv4';
     }
     
     .glavnaVijest {
@@ -91,6 +158,4 @@ p {
     .glavnaVijest img {
         height: 50%;
     }
-    
-    
 }
