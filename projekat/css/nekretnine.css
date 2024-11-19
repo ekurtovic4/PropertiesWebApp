@@ -27,7 +27,7 @@ iframe {
     padding: 20px;
     justify-content: flex-start;
     /* Centriranje po horizontali */
-    align-content: center;
+    align-content: flex-start;
     /* Centriranje po vertikali */
     max-width: 1280px;
     margin: 0 auto;
