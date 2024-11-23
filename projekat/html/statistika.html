@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="bs-BA">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistika</title>
+    <link rel="stylesheet" type="text/css" href="../css/statistika.css">
+</head>
+
+<body>
+    <iframe src="meni.html"></iframe>
+
+    <div id="glavni">
+        <div id="unosParametara">
+            <h2>Unos parametara</h2>
+            <div class="unos">
+                <h3>Period</h3>
+                <br>
+                <label for="odPeriod">Od: </label>
+                <input type="text" id="odPeriod" name="odPeriod">
+                <label for="doPeriod">Do: </label>
+                <input type="text" id="doPeriod" name="doPeriod">
+                <br>
+                <button type="submit" onclick="dodajPeriod()">Dodaj period</button>
+            </div>
+        
+            <div class="unos">
+                <h3>Raspon cijena</h3>
+                <br>
+                <label for="odCijena">Od: </label>
+                <input type="text" id="odCijena" name="odCijena">
+                <label for="doCijena">Do: </label>
+                <input type="text" id="doCijena" name="doCijena">
+                <br>
+                <button type="submit" onclick="dodajRaspon()">Dodaj raspon</button>
+            </div>
+    
+            <br>
+            <button type="submit" class="mainBtn" onclick="iscrtajHistogram()">Generiši histogram</button>
+        </div>
+    
+        <div id="histogram">
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="../Scripts/SpisakNekretnina.js"></script>
+    <script type="text/javascript" src="../Scripts/StatistikaNekretnina.js"></script>
+    <script type="text/javascript" src="../Scripts/statistika.js"></script>
+</body>
+
+</html>

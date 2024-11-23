@@ -48,12 +48,8 @@ StatistikaNekretnina = function(){
 
     let mojeNekretnine = function(korisnik){
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine({}).filter(nekretnina => {
-            if(nekretnina.upiti.some(upit => upit.korisnik_id == korisnik.id)){
-                return true;
-            }
-            return false;
-        } 
-        );
+            return (nekretnina.upiti.some(upit => upit.korisnik_id == korisnik.id));
+        });
 
         let sortiraneNekretnine = filtriraneNekretnine.sort((a, b) => b.upiti.length - a.upiti.length);
         return sortiraneNekretnine;
@@ -66,17 +62,13 @@ StatistikaNekretnina = function(){
         periodi.forEach((period, indeksPerioda) => {
             let filtriraneNekretninePeriod = sveNekretnine.filter(nekretnina => {
                 let godinaObjave = nekretnina["datum_objave"].substring(6, 10);
-
-                if(godinaObjave >= period.od && godinaObjave <= period.do){
-                    return true;
-                }
-                return false;
+                return (godinaObjave >= period.od && godinaObjave < period.do);
             });
 
             rasponiCijena.forEach((raspon, indeksRasponaCijena) => {
                 let brojURasponu = 0;
                 for(nekretnina of filtriraneNekretninePeriod){
-                    if(nekretnina.cijena >= raspon.od && nekretnina.cijena <= raspon.do){
+                    if(nekretnina.cijena >= raspon.od && nekretnina.cijena < raspon.do){
                         brojURasponu++;
                     }
                 }
