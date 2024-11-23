@@ -12,16 +12,10 @@ function carousel(direction){
 
     if(direction == "left"){
         carouselFunkcija.fnLijevo();
-        indeks--;
-        if(indeks == -1){
-            indeks = brojElemenata - 1;
-        }
+        indeks = (indeks - 1 + brojElemenata) % brojElemenata;
     }
     else if(direction == "right"){
         carouselFunkcija.fnDesno();
-        indeks++;
-        if(indeks == brojElemenata){
-            indeks = 0;
-        }
+        indeks = (indeks + 1) % brojElemenata;
     }
 }
