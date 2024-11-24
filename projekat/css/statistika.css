@@ -1,23 +1,40 @@
 body {
-    background-color: #fdf1d3;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
+  background-color: #fdf1d3;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
 body h3 {
   margin: 0px;
 }
   
 iframe {
-    border: none; 
-    width: 100%;
-    height: fit-content;
-  }
+  border: none; 
+  width: 100%;
+  height: fit-content;
+}
+
+#opcije {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#prosjecnaKvadratura, #outlier, #mojeNekretnine {
+  flex: 1;
+  border: 2px solid #000;
+  background-color: white;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  padding: 0px 20px 20px 20px;
+}
 
 #glavni {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 #unosParametara {
@@ -52,7 +69,7 @@ iframe {
   background-color: #545454;
 }
 
-.unos input {
+.unos input, #prosjecnaKvadratura select, #outlier select {
   margin-right: 15px;
 }
 
@@ -61,17 +78,19 @@ iframe {
   width: 400px;
 }
 
-@media only screen and (max-width: 980px) {
-  #histogram {
-    margin-left: auto;
-  }
+#kvadraturaKriterijVrijednost, #outlierKriterijVrijednost {
+  display: none; 
 }
 
-@media only screen and (max-width: 900px) {
-  #glavni {
-    flex-direction: column;
-  }
-  #histogram {
-    margin-left: 40px;
-  }
+#prosjecnaKvadratura p{
+  margin-bottom: 0;
+}
+
+#mojeNekretnine td, th {
+  text-align: center;
+}
+
+#mojeNekretnine table {
+  border-collapse: separate;
+  border-spacing: 20px 10px;
 }

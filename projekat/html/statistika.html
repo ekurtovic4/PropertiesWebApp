@@ -11,9 +11,84 @@
 <body>
     <iframe src="meni.html"></iframe>
 
+    <div id="opcije">
+        <div id="prosjecnaKvadratura">
+            <h2>Prosječna kvadratura</h2>
+            <label for="kvadraturaKriterij">Kriterij: </label>
+            <select id="kvadraturaKriterij" name="kvadraturaKriterij" onchange="prikaziUnos('kvadratura')">
+                <option value="tip_nekretnine">Tip nekretnine</option>
+                <option value="min_kvadratura">Minimalna kvadratura</option>
+                <option value="max_kvadratura">Maksimalna kvadratura</option>
+                <option value="min_cijena">Minimalna cijena</option>
+                <option value="max_cijena">Maksimalna cijena</option>
+            </select>
+    
+            <select id="tipNekretnineSelect" name="tipNekretnineSelect">
+                <option value="Stan">Stan</option>
+                <option value="Kuća">Kuća</option>
+                <option value="Poslovni prostor">Poslovni prostor</option>
+            </select>
+    
+            <input type="text" id="kvadraturaKriterijVrijednost" name="kvadraturaKriterijVrijednost" placeholder="Vrijednost kriterija">
+    
+            <br><br>
+            <button type="submit" class="mainBtn" onclick="prosjecnaKvadratura()">Izračunaj</button>
+    
+            <div id="prosjecnaKvadraturaOdgovor">
+            </div>
+        </div>
+
+        <div id="outlier">
+            <h2>Outlier</h2>
+            <label for="outlierKriterij">Kriterij: </label>
+            <select id="outlierKriterij" name="outlierKriterij" onchange="prikaziUnos('outlier')">
+                <option value="tip_nekretnine">Tip nekretnine</option>
+                <option value="min_kvadratura">Minimalna kvadratura</option>
+                <option value="max_kvadratura">Maksimalna kvadratura</option>
+                <option value="min_cijena">Minimalna cijena</option>
+                <option value="max_cijena">Maksimalna cijena</option>
+            </select>
+    
+            <select id="outlierTipNekretnineSelect" name="outlierTipNekretnineSelect">
+                <option value="Stan">Stan</option>
+                <option value="Kuća">Kuća</option>
+                <option value="Poslovni prostor">Poslovni prostor</option>
+            </select>
+    
+            <input type="text" id="outlierKriterijVrijednost" name="outlierKriterijVrijednost" placeholder="Vrijednost kriterija">
+    
+            <br><br>
+            <label for="svojstvoSelect">Svojstvo: </label>
+            <select id="svojstvoSelect" name="svojstvoSelect">
+                <option value="kvadratura">Kvadratura</option>
+                <option value="cijena">Cijena</option>
+                <option value="godina_izgradnje">Godina izgradnje</option>
+            </select>
+    
+            <br><br>
+            <button type="submit" class="mainBtn" onclick="outlier()">Daj outlier</button>
+    
+            <div id="outlierOdgovor">
+            </div>
+        </div>
+
+        <div id="mojeNekretnine">
+            <h2>Moje nekretnine</h2>
+            <label for="idUnos">ID korisnika: </label>
+            <input type="text" id="idUnos" name="idUnos">
+    
+            <br><br>
+            <button type="submit" class="mainBtn" onclick="mojeNekretnine()">Pretraži</button>
+    
+            <br><br>
+            <div id="mojeNekretnineOdgovor">
+            </div>
+        </div>
+    </div>
+
     <div id="glavni">
         <div id="unosParametara">
-            <h2>Unos parametara</h2>
+            <h2>Histogram: cijene kroz periode</h2>
             <div class="unos">
                 <h3>Period</h3>
                 <br>
@@ -37,7 +112,7 @@
             </div>
     
             <br>
-            <button type="submit" class="mainBtn" onclick="iscrtajHistogram()">Generiši histogram</button>
+            <button type="submit" class="mainBtn" onclick="iscrtajHistogram()">Iscrtaj histogram</button>
         </div>
     
         <div id="histogram">

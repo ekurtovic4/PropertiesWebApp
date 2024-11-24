@@ -232,6 +232,123 @@ function iscrtajHistogram(){
         }
     }
 
-    listaNekretnina.length = 0;
-    listaKorisnika.length = 0;
+    periodi.length = 0;
+    rasponiCijena.length = 0;
+}
+
+function prikaziUnos(tip){
+    if(tip == 'kvadratura'){
+        let kriterij = document.getElementById("kvadraturaKriterij").value;
+        document.getElementById("tipNekretnineSelect").style.display = "none";
+        document.getElementById("kvadraturaKriterijVrijednost").style.display = "none";
+
+        if(kriterij == "tip_nekretnine"){
+            document.getElementById("tipNekretnineSelect").style.display = "inline";
+        }
+        else{
+            document.getElementById("kvadraturaKriterijVrijednost").style.display = "inline";
+        }
+    }
+    else if(tip == 'outlier'){
+        let kriterij = document.getElementById("outlierKriterij").value;
+        document.getElementById("outlierTipNekretnineSelect").style.display = "none";
+        document.getElementById("outlierKriterijVrijednost").style.display = "none";
+
+        if(kriterij == "tip_nekretnine"){
+            document.getElementById("outlierTipNekretnineSelect").style.display = "inline";
+        }
+        else{
+            document.getElementById("outlierKriterijVrijednost").style.display = "inline";
+        }
+    }
+}
+
+function prosjecnaKvadratura(){
+    let kriterij = document.getElementById("kvadraturaKriterij").value;
+    let vrijednost;
+
+    if(kriterij != "tip_nekretnine"){
+        vrijednost = parseInt(document.getElementById("kvadraturaKriterijVrijednost").value);
+        if(vrijednost < 0){
+            alert("Unesena vrijednost kriterija nije validna!");
+            return;
+        }
+    }
+    else{
+        vrijednost = document.getElementById("tipNekretnineSelect").value;
+    }
+
+    let kriterijObjekat = {};
+    kriterijObjekat[kriterij] = vrijednost;
+
+    let result = statistika.prosjecnaKvadratura(kriterijObjekat);
+
+    if(result != -1){
+        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Prosječna kvadratura za zadani kriterij: " + result + "</p>";
+    }
+    else{
+        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Greška pri izračunu!</p>";
+    }
+}
+
+function outlier(){
+    let kriterij = document.getElementById("outlierKriterij").value;
+    let vrijednost;
+
+    if(kriterij != "tip_nekretnine"){
+        vrijednost = parseInt(document.getElementById("outlierKriterijVrijednost").value);
+        if(vrijednost < 0){
+            alert("Unesena vrijednost kriterija nije validna!");
+            return;
+        }
+    }
+    else{
+        vrijednost = document.getElementById("outlierTipNekretnineSelect").value;
+    }
+
+    let kriterijObjekat = {};
+    kriterijObjekat[kriterij] = vrijednost;
+    let nazivSvojstva = document.getElementById("svojstvoSelect").value;
+
+    let result = statistika.outlier(kriterijObjekat, nazivSvojstva);
+    let htmlContent = "";
+
+    if(result === null){
+        htmlContent += "<p>Nema outliera za zadani kriterij!</p>"
+    }
+    else{
+        htmlContent += "<p>Tip nekretnine: " + result.tip_nekretnine + "</p><p>Naziv: " + result.naziv + "</p><p>Kvadratura: " + result.kvadratura + "</p><p>Cijena: " + result.cijena + "</p>";
+    }
+
+    document.getElementById("outlierOdgovor").innerHTML = htmlContent;
+}
+
+function mojeNekretnine(){
+    let idKorisnika = parseInt(document.getElementById("idUnos").value);
+    let htmlContent = "";
+
+    if(isNaN(idKorisnika)){
+        alert("Uneseni ID korisnika nije validan!");
+        return;
+    }
+
+    let korisnik = listaKorisnika.find(kor => kor.id == idKorisnika);
+    if(korisnik){
+        let resultList = statistika.mojeNekretnine(korisnik);
+        if(resultList.length != 0){
+            htmlContent += "<table><th>Tip</th><th>Naziv</th><th>Kvadratura</th><th>Cijena</th>";
+            
+            for(result of resultList){
+                htmlContent += "<tr><td>" + result.tip_nekretnine + "</td><td>" + result.naziv + "</td><td>" + result.kvadratura + "</td><td>" + result.cijena + "</td></tr>";
+            }
+        }
+        else{
+            htmlContent += "Nema rezultata za traženog korisnika!";
+        }
+    }
+    else{
+        htmlContent += "Traženi korisnik ne postoji!"
+    }  
+
+    document.getElementById("mojeNekretnineOdgovor").innerHTML = htmlContent;
 }

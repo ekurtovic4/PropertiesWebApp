@@ -13,6 +13,10 @@ StatistikaNekretnina = function(){
 
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
 
+        if(filtriraneNekretnine.length == 0){
+            return 0;
+        }
+
         let suma = 0;
         for(nekretnina of filtriraneNekretnine){
             suma += nekretnina.kvadratura;
@@ -28,6 +32,10 @@ StatistikaNekretnina = function(){
         }
 
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
+
+        if(filtriraneNekretnine.length == 0){
+            return null;
+        }
 
         let prosjek = 0;
         for(nekretnina of filtriraneNekretnine){
