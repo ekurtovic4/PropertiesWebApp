@@ -1,5 +1,4 @@
 let indeks = 0;
-let prviPoziv = true;
 
 function carousel(direction){
     let glavniElement = document.getElementById("upiti");
