@@ -70,13 +70,13 @@ StatistikaNekretnina = function(){
         periodi.forEach((period, indeksPerioda) => {
             let filtriraneNekretninePeriod = sveNekretnine.filter(nekretnina => {
                 let godinaObjave = nekretnina["datum_objave"].substring(6, 10);
-                return (godinaObjave >= period.od && godinaObjave < period.do);
+                return (godinaObjave >= period.od && godinaObjave <= period.do);
             });
 
             rasponiCijena.forEach((raspon, indeksRasponaCijena) => {
                 let brojURasponu = 0;
                 for(nekretnina of filtriraneNekretninePeriod){
-                    if(nekretnina.cijena >= raspon.od && nekretnina.cijena < raspon.do){
+                    if(nekretnina.cijena >= raspon.od && nekretnina.cijena <= raspon.do){
                         brojURasponu++;
                     }
                 }
