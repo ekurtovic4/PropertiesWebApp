@@ -94,12 +94,6 @@ iframe {
   display: none;
 }
 
-@media only screen and (max-width: 800px) {
-  #upiti .upit {
-    display: block;
-  }
-}
-
 @media only screen and (max-width : 600px) {
   #upiti .upit {
     display: none;
