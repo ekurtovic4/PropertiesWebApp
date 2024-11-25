@@ -6,15 +6,15 @@ function postaviCarousel(glavniElement, sviElementi, indeks = 0){
     let brojElemenata = sviElementi.length;
 
     const fnLijevo = function(){
-        glavniElement.children[indeks].style.display = "none"; 
+        glavniElement.children[indeks].classList.remove("upit-prikazi");
         indeks = (indeks - 1 + brojElemenata) % brojElemenata;
-        glavniElement.children[indeks].style.display = "block"; 
+        glavniElement.children[indeks].classList.add("upit-prikazi");
     }
 
     const fnDesno = function(){
-        glavniElement.children[indeks].style.display = "none"; 
+        glavniElement.children[indeks].classList.remove("upit-prikazi");
         indeks = (indeks + 1) % brojElemenata;
-        glavniElement.children[indeks].style.display = "block"; 
+        glavniElement.children[indeks].classList.add("upit-prikazi");
     }
 
     return {

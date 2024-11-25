@@ -3,11 +3,6 @@ let prviPoziv = true;
 
 function carousel(direction){
     let glavniElement = document.getElementById("upiti");
-
-    if(prviPoziv){
-        document.querySelector(".upit-prikazi").classList.remove(".upit-prikazi");
-        prviPoziv = false;
-    }
     
     let sviElementi = document.querySelectorAll(".upit");
     let brojElemenata = sviElementi.length;
