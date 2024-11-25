@@ -1,11 +1,14 @@
 let indeks = 0;
+let prviPoziv = true;
 
 function carousel(direction){
-    let glavniElement = document.querySelector("#glavniUpit");
-    glavniElement.classList.add("glavni-upit");
+    let glavniElement = document.getElementById("upiti");
 
-    document.querySelector(".upit-prikazi").style.display = "none";
-
+    if(prviPoziv){
+        document.querySelector(".upit-prikazi").classList.remove(".upit-prikazi");
+        prviPoziv = false;
+    }
+    
     let sviElementi = document.querySelectorAll(".upit");
     let brojElemenata = sviElementi.length;
     let carouselFunkcija = postaviCarousel(glavniElement, sviElementi, indeks);
