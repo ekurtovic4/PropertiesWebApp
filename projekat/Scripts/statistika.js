@@ -121,17 +121,26 @@ const listaKorisnika = [{
     username: "username2",
 }]
 
+let statistika = StatistikaNekretnina();
+statistika.init(listaNekretnina, listaKorisnika);
+
+let spisak = SpisakNekretnina();
+spisak.init(listaNekretnina, listaKorisnika);
+
 let periodi = [];
 let rasponiCijena = [];
 
+let kvadraturaKriterijOpcije = document.getElementById("kvadraturaKriterij").innerHTML;
+let outlierKriterijOpcije = document.getElementById("outlierKriterij").innerHTML;
+
 function dodajPeriod() {
-    let odPeriod = parseInt(document.getElementById("odPeriod").value);
-    let doPeriod = parseInt(document.getElementById("doPeriod").value);
+    let odPeriod = parseInt(document.getElementById("odPeriod").value.trim());
+    let doPeriod = parseInt(document.getElementById("doPeriod").value.trim());
 
     document.getElementById("odPeriod").value = "";
     document.getElementById("doPeriod").value = "";
 
-    if(isNaN(odPeriod) || isNaN(doPeriod) || !(odPeriod <= doPeriod) || odPeriod <= 0 || doPeriod <= 0){
+    if(isNaN(odPeriod) || isNaN(doPeriod) || !(odPeriod <= doPeriod) || odPeriod < 0 || doPeriod < 0){
         alert("Unos granica vremenskog perioda nije validan!");
         return;
     }
@@ -143,13 +152,13 @@ function dodajPeriod() {
 }
 
 function dodajRaspon() {
-    let odCijena = parseInt(document.getElementById("odCijena").value);
-    let doCijena = parseInt(document.getElementById("doCijena").value);
+    let odCijena = parseInt(document.getElementById("odCijena").value.trim());
+    let doCijena = parseInt(document.getElementById("doCijena").value.trim());
 
     document.getElementById("odCijena").value = "";
     document.getElementById("doCijena").value = "";
 
-    if(isNaN(odCijena) || isNaN(doCijena) || !(odCijena <= doCijena) || odCijena <= 0 || doCijena <= 0){
+    if(isNaN(odCijena) || isNaN(doCijena) || !(odCijena <= doCijena) || odCijena < 0 || doCijena < 0){
         alert("Unos granica cjenovnog raspona nije validan!");
         return;
     }
@@ -159,9 +168,6 @@ function dodajRaspon() {
         do: doCijena
     });
 }
-
-let statistika = StatistikaNekretnina();
-statistika.init(listaNekretnina, listaKorisnika);
 
 function iscrtajHistogram(){
     let dataUkupno = statistika.histogramCijena(periodi, rasponiCijena);
@@ -210,7 +216,10 @@ function iscrtajHistogram(){
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1 
+                            }
                         }
                     },
                     plugins: {
@@ -241,9 +250,15 @@ function prikaziUnos(tip){
         let kriterij = document.getElementById("kvadraturaKriterij").value;
         document.getElementById("tipNekretnineSelect").style.display = "none";
         document.getElementById("kvadraturaKriterijVrijednost").style.display = "none";
+        document.getElementById("kvadraturaKriterijMin").style.display = "none";
+        document.getElementById("kvadraturaKriterijMax").style.display = "none";
 
         if(kriterij == "tip_nekretnine"){
             document.getElementById("tipNekretnineSelect").style.display = "inline";
+        }
+        else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+            document.getElementById("kvadraturaKriterijMin").style.display = "inline";
+            document.getElementById("kvadraturaKriterijMax").style.display = "inline";
         }
         else{
             document.getElementById("kvadraturaKriterijVrijednost").style.display = "inline";
@@ -253,9 +268,15 @@ function prikaziUnos(tip){
         let kriterij = document.getElementById("outlierKriterij").value;
         document.getElementById("outlierTipNekretnineSelect").style.display = "none";
         document.getElementById("outlierKriterijVrijednost").style.display = "none";
+        document.getElementById("outlierKriterijMin").style.display = "none";
+        document.getElementById("outlierKriterijMax").style.display = "none";
 
         if(kriterij == "tip_nekretnine"){
             document.getElementById("outlierTipNekretnineSelect").style.display = "inline";
+        }
+        else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+            document.getElementById("outlierKriterijMin").style.display = "inline";
+            document.getElementById("outlierKriterijMax").style.display = "inline";
         }
         else{
             document.getElementById("outlierKriterijVrijednost").style.display = "inline";
@@ -263,25 +284,128 @@ function prikaziUnos(tip){
     }
 }
 
-function prosjecnaKvadratura(){
-    let kriterij = document.getElementById("kvadraturaKriterij").value;
-    let vrijednost;
+let kriterijiProsjecnaKvadratura = [];
 
-    if(kriterij != "tip_nekretnine"){
-        vrijednost = parseInt(document.getElementById("kvadraturaKriterijVrijednost").value);
-        if(vrijednost < 0){
-            alert("Unesena vrijednost kriterija nije validna!");
+function dodajKriterijProsjecnaKvadratura(){
+    let kriterij = document.getElementById("kvadraturaKriterij").value;
+
+    if(kriterij == "tip_nekretnine"){
+        let kriterijObjekat = {};
+        kriterijObjekat[kriterij] = document.getElementById("tipNekretnineSelect").value;
+        kriterijiProsjecnaKvadratura.push(kriterijObjekat);
+    }
+    else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+        let minVr = parseInt(document.getElementById("kvadraturaKriterijMin").value.trim());
+        let maxVr = parseInt(document.getElementById("kvadraturaKriterijMax").value.trim());
+
+        if(isNaN(minVr) || isNaN(maxVr) || !(minVr <= maxVr) || minVr < 0 || maxVr < 0){
+            alert("Unos granica raspona nije validan!");
             return;
         }
+
+        let kriterijObjekat = {};
+        if(kriterij == "raspon_kvadrature"){
+            kriterijObjekat["min_kvadratura"] = minVr;
+        }
+        else{
+            kriterijObjekat["min_cijena"] = minVr;
+        }
+        kriterijiProsjecnaKvadratura.push(kriterijObjekat);
+
+        kriterijObjekat = {};
+        if(kriterij == "raspon_kvadrature"){
+            kriterijObjekat["max_kvadratura"] = maxVr;
+        }
+        else{
+            kriterijObjekat["max_cijena"] = maxVr;
+        }
+        kriterijiProsjecnaKvadratura.push(kriterijObjekat);
+
+        document.getElementById("kvadraturaKriterijMin").value = "";
+        document.getElementById("kvadraturaKriterijMax").value = "";
     }
     else{
-        vrijednost = document.getElementById("tipNekretnineSelect").value;
+        let kriterijObjekat = {};
+        let vrijednost = document.getElementById("kvadraturaKriterijVrijednost").value.trim();
+
+        if(vrijednost == ""){
+            alert("Unos vrijednosti kriterija nije validan!");
+            return;
+        }
+
+        if(kriterij == "id" || kriterij == "godina_izgradnje" || kriterij == "broj_upita"){
+            if(parseInt(vrijednost) < 0){
+                alert("Unos vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        if(kriterij == "datum_objave"){
+            const regex = /^\d{2}\.\d{2}\.\d{4}\.$/;
+            if(!regex.test(vrijednost)){
+                alert("Format unesene vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        if(kriterij == "godina_izgradnje"){
+            const regex = /^\d{4}$/;
+            if(!regex.test(vrijednost)){
+                alert("Format unesene vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        kriterijObjekat[kriterij] = vrijednost;
+        kriterijiProsjecnaKvadratura.push(kriterijObjekat);
+        document.getElementById("kvadraturaKriterijVrijednost").value = "";
     }
 
-    let kriterijObjekat = {};
-    kriterijObjekat[kriterij] = vrijednost;
+    ukloniKriterijProsjecnaKvadratura(kriterij);
+}
 
-    let result = statistika.prosjecnaKvadratura(kriterijObjekat);
+function ukloniKriterijProsjecnaKvadratura(kriterij){
+    let kriteriji = document.getElementById("kvadraturaKriterij");
+    for(let i = 0; i < kriteriji.options.length; i++){
+        if(kriteriji.options[i].value == kriterij){
+            kriteriji.remove(i);
+            break;
+        }
+    }
+
+    if(kriterij == "tip_nekretnine"){
+        document.getElementById("tipNekretnineSelect").style.display = "none";
+    }
+    else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+        document.getElementById("kvadraturaKriterijMin").style.display = "none";
+        document.getElementById("kvadraturaKriterijMax").style.display = "none";
+    }
+    else{
+        document.getElementById("kvadraturaKriterijVrijednost").style.display = "none";
+    }
+}
+
+function resetProsjecnaKvadratura(){
+    kriterijiProsjecnaKvadratura.length = 0;
+    document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "";
+    document.getElementById("kvadraturaKriterij").innerHTML = kvadraturaKriterijOpcije;
+    
+    document.getElementById("tipNekretnineSelect").style.display = "inline";
+    document.getElementById("kvadraturaKriterijVrijednost").style.display = "none";
+    document.getElementById("kvadraturaKriterijMin").style.display = "none";
+    document.getElementById("kvadraturaKriterijMax").style.display = "none";
+}
+
+function prosjecnaKvadratura(){
+    let filtriraneNekretnine = listaNekretnina;
+
+    for(kriterij of kriterijiProsjecnaKvadratura){
+        filtriraneNekretnine = spisak.filtrirajNekretnine(kriterij);
+        spisak.init(filtriraneNekretnine, listaKorisnika);
+    }
+
+    statistika.init(filtriraneNekretnine, listaKorisnika);
+    let result = statistika.prosjecnaKvadratura({});
 
     if(result != -1){
         document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Prosječna kvadratura za zadani kriterij: " + result + "</p>";
@@ -289,50 +413,155 @@ function prosjecnaKvadratura(){
     else{
         document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Greška pri izračunu!</p>";
     }
+
+    kriterijiProsjecnaKvadratura.length = 0;
+    document.getElementById("kvadraturaKriterij").innerHTML = kvadraturaKriterijOpcije;
 }
 
-function outlier(){
-    let kriterij = document.getElementById("outlierKriterij").value;
-    let vrijednost;
+let kriterijiOutlier = [];
 
-    if(kriterij != "tip_nekretnine"){
-        vrijednost = parseInt(document.getElementById("outlierKriterijVrijednost").value);
-        if(vrijednost < 0){
-            alert("Unesena vrijednost kriterija nije validna!");
+function dodajKriterijOutlier(){
+    let kriterij = document.getElementById("outlierKriterij").value;
+
+    if(kriterij == "tip_nekretnine"){
+        let kriterijObjekat = {};
+        kriterijObjekat[kriterij] = document.getElementById("outlierTipNekretnineSelect").value;
+        kriterijiOutlier.push(kriterijObjekat);
+    }
+    else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+        let minVr = parseInt(document.getElementById("outlierKriterijMin").value.trim());
+        let maxVr = parseInt(document.getElementById("outlierKriterijMax").value.trim());
+
+        if(isNaN(minVr) || isNaN(maxVr) || !(minVr <= maxVr) || minVr < 0 || maxVr < 0){
+            alert("Unos granica raspona nije validan!");
             return;
         }
+
+        let kriterijObjekat = {};
+        if(kriterij == "raspon_kvadrature"){
+            kriterijObjekat["min_kvadratura"] = minVr;
+        }
+        else{
+            kriterijObjekat["min_cijena"] = minVr;
+        }
+        kriterijiOutlier.push(kriterijObjekat);
+
+        kriterijObjekat = {};
+        if(kriterij == "raspon_kvadrature"){
+            kriterijObjekat["max_kvadratura"] = maxVr;
+        }
+        else{
+            kriterijObjekat["max_cijena"] = maxVr;
+        }
+        kriterijiOutlier.push(kriterijObjekat);
+
+        document.getElementById("outlierKriterijMin").value = "";
+        document.getElementById("outlierKriterijMax").value = "";
     }
     else{
-        vrijednost = document.getElementById("outlierTipNekretnineSelect").value;
+        let kriterijObjekat = {};
+        let vrijednost = document.getElementById("outlierKriterijVrijednost").value.trim();
+        
+        if(vrijednost == ""){
+            alert("Unos vrijednosti kriterija nije validan!");
+            return;
+        }
+
+        if(kriterij == "id" || kriterij == "godina_izgradnje" || kriterij == "broj_upita"){
+            if(parseInt(vrijednost) < 0){
+                alert("Unos vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        if(kriterij == "datum_objave"){
+            const regex = /^\d{2}\.\d{2}\.\d{4}\.$/;
+            if(!regex.test(vrijednost)){
+                alert("Format unesene vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        if(kriterij == "godina_izgradnje"){
+            const regex = /^\d{4}$/;
+            if(!regex.test(vrijednost)){
+                alert("Format unesene vrijednosti kriterija nije validan!");
+                return;
+            }
+        }
+
+        kriterijObjekat[kriterij] = vrijednost;
+        kriterijiOutlier.push(kriterijObjekat);
+        document.getElementById("outlierKriterijVrijednost").value = "";
     }
 
-    let kriterijObjekat = {};
-    kriterijObjekat[kriterij] = vrijednost;
-    let nazivSvojstva = document.getElementById("svojstvoSelect").value;
+    ukloniKriterijOutlier(kriterij);
+}
 
-    let result = statistika.outlier(kriterijObjekat, nazivSvojstva);
+function ukloniKriterijOutlier(kriterij){
+    let kriteriji = document.getElementById("outlierKriterij");
+    for(let i = 0; i < kriteriji.options.length; i++){
+        if(kriteriji.options[i].value == kriterij){
+            kriteriji.remove(i);
+            break;
+        }
+    }
+
+    if(kriterij == "tip_nekretnine"){
+        document.getElementById("outlierTipNekretnineSelect").style.display = "none";
+    }
+    else if(kriterij == "raspon_kvadrature" || kriterij == "raspon_cijene"){
+        document.getElementById("outlierKriterijMin").style.display = "none";
+        document.getElementById("outlierKriterijMax").style.display = "none";
+    }
+    else{
+        document.getElementById("outlierKriterijVrijednost").style.display = "none";
+    }        
+}
+
+function resetOutlier(){
+    kriterijiOutlier.length = 0;
+    document.getElementById("outlierOdgovor").innerHTML = "";
+    document.getElementById("outlierKriterij").innerHTML = outlierKriterijOpcije;
+
+    document.getElementById("outlierTipNekretnineSelect").style.display = "inline";
+    document.getElementById("outlierKriterijVrijednost").style.display = "none";
+    document.getElementById("outlierKriterijMin").style.display = "none";
+    document.getElementById("outlierKriterijMax").style.display = "none";
+}
+
+function outlier(){     
+    let filtriraneNekretnine = listaNekretnina;
+
+    for(kriterij of kriterijiProsjecnaKvadratura){
+        filtriraneNekretnine = spisak.filtrirajNekretnine(kriterij);
+        spisak.init(filtriraneNekretnine, listaKorisnika);
+    }
+
+    statistika.init(filtriraneNekretnine, listaKorisnika);
+
+    let nazivSvojstva = document.getElementById("svojstvoSelect").value;
+    let result = statistika.outlier({}, nazivSvojstva);
+
     let htmlContent = "";
 
     if(result === null){
-        htmlContent += "<p>Nema outliera za zadani kriterij!</p>"
+        htmlContent += "<p>Nema outliera za zadane kriterije!</p>"
     }
     else{
         htmlContent += "<p>Tip nekretnine: " + result.tip_nekretnine + "</p><p>Naziv: " + result.naziv + "</p><p>Kvadratura: " + result.kvadratura + "</p><p>Cijena: " + result.cijena + "</p>";
     }
 
     document.getElementById("outlierOdgovor").innerHTML = htmlContent;
+    kriterijiOutlier.length = 0;
+    document.getElementById("outlierKriterij").innerHTML = outlierKriterijOpcije;
 }
 
 function mojeNekretnine(){
-    let idKorisnika = parseInt(document.getElementById("idUnos").value);
+    let username = document.getElementById("username").value.trim();
     let htmlContent = "";
 
-    if(isNaN(idKorisnika)){
-        alert("Uneseni ID korisnika nije validan!");
-        return;
-    }
-
-    let korisnik = listaKorisnika.find(kor => kor.id == idKorisnika);
+    let korisnik = listaKorisnika.find(kor => kor.username == username);
     if(korisnik){
         let resultList = statistika.mojeNekretnine(korisnik);
         if(resultList.length != 0){

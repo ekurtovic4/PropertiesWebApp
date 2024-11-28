@@ -36,6 +36,46 @@ let SpisakNekretnina = function () {
             if (kriterij.max_cijena && nekretnina.cijena > kriterij.max_cijena) {
                 return false;
             }
+            
+            // Dodatno filtriranje po id-u
+            if (kriterij.id && nekretnina.id != kriterij.id) {
+                return false;
+            }
+
+            // Dodatno filtriranje po nazivu
+            if (kriterij.naziv && nekretnina.naziv != kriterij.naziv) {
+                return false;
+            }
+
+            // Dodatno filtriranje po tipu grijanja
+            if (kriterij.tip_grijanja && nekretnina.tip_grijanja != kriterij.tip_grijanja) {
+                return false;
+            }
+
+            // Dodatno filtriranje po lokaciji
+            if (kriterij.lokacija && nekretnina.lokacija != kriterij.lokacija) {
+                return false;
+            }
+
+            // Dodatno filtriranje po godini izgradnje
+            if(kriterij.godina_izgradnje && nekretnina.godina_izgradnje != kriterij.godina_izgradnje) {
+                return false;
+            }
+
+            // Dodatno filtriranje po datumu objave
+            if(kriterij.datum_objave && nekretnina.datum_objave != kriterij.datum_objave) {
+                return false;
+            }
+
+            // Dodatno filtriranje po opisu
+            if(kriterij.opis && nekretnina.opis != kriterij.opis) {
+                return false;
+            }
+
+            // Dodatno filtriranje po broju upita
+            if(kriterij.broj_upita && nekretnina.upiti.length != kriterij.broj_upita) {
+                return false;
+            }
 
             return true;
         });

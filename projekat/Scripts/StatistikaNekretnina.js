@@ -1,4 +1,4 @@
-StatistikaNekretnina = function(){
+let StatistikaNekretnina = function(){
     let spisakNekretnina;
 
     let init = function(listaNekretnina, listaKorisnika){
@@ -7,9 +7,9 @@ StatistikaNekretnina = function(){
     }
 
     let prosjecnaKvadratura = function(kriterij){
-        if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij)){
+        /*if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij)){
             return -1;
-        }
+        }*/
 
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
 
@@ -26,10 +26,10 @@ StatistikaNekretnina = function(){
     }
 
     let outlier = function(kriterij, nazivSvojstva){
-        if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij) 
+        /*if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij) 
             || !(nazivSvojstva == "kvadratura" || nazivSvojstva == "cijena" || nazivSvojstva == "godina_izgradnje")){
             return null;
-        }
+        }*/
 
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
 
@@ -38,10 +38,11 @@ StatistikaNekretnina = function(){
         }
 
         let prosjek = 0;
-        for(nekretnina of filtriraneNekretnine){
+        let sveNekretnine = spisakNekretnina.filtrirajNekretnine({});
+        for(nekretnina of sveNekretnine){
             prosjek += nekretnina[nazivSvojstva];
         }
-        prosjek /= filtriraneNekretnine.length;
+        prosjek /= sveNekretnine.length;
 
         let outlier = { nekretnina: null, odstupanje: 0 };
         for(nekretnina of filtriraneNekretnine){
@@ -99,4 +100,4 @@ StatistikaNekretnina = function(){
         mojeNekretnine: mojeNekretnine,
         histogramCijena: histogramCijena
     }
-}
+};

@@ -28,7 +28,7 @@ iframe {
   margin-left: 10px;
   margin-right: 10px;
   margin-bottom: 20px;
-  padding: 0px 20px 20px 20px;
+  padding: 0px 20px 10px 20px;
 }
 
 #glavni {
@@ -47,6 +47,8 @@ iframe {
   background-color: #ff9900;
   border: 2px solid #f8af42;
   padding: 5px;
+  display: block;
+  margin-right: 15px;
 }
 
 .mainBtn:hover {
@@ -57,16 +59,24 @@ iframe {
   padding-bottom: 30px;
 }
 
-.unos button {
-  margin-top: 20px;
+.unosButton {
   background-color: #333;
   color: white;
-  float: right;
   margin-right: 15px;
 }
 
-.unos button:hover {
+.unosButton:hover {
   background-color: #545454;
+}
+
+#prosjecnaKvadratura .unosButton, #outlier .unosButton {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.unos button {
+  margin-top: 20px;
+  float: right;
 }
 
 .unos input, #prosjecnaKvadratura select, #outlier select {
@@ -78,8 +88,17 @@ iframe {
   width: 400px;
 }
 
-#kvadraturaKriterijVrijednost, #outlierKriterijVrijednost {
+#kvadraturaKriterijVrijednost, #outlierKriterijVrijednost, #kvadraturaKriterijMin, #kvadraturaKriterijMax, #outlierKriterijMin, #outlierKriterijMax {
   display: none; 
+}
+
+#kvadraturaKriterijMin, #kvadraturaKriterijMax, #outlierKriterijMin, #outlierKriterijMax {
+  margin-top: 15px;
+  margin-right: 10px;
+}
+
+#svojstvoSelect {
+  margin-top: 15px;
 }
 
 #prosjecnaKvadratura p{
@@ -91,6 +110,21 @@ iframe {
 }
 
 #mojeNekretnine table {
+  margin-top: 10px;
   border-collapse: separate;
   border-spacing: 20px 10px;
+}
+
+#mojeNekretnine .mainBtn {
+  margin-top: 20px;
+}
+
+#mojeNekretnineOdgovor {
+  margin-top: 20px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
 }

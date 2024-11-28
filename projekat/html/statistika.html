@@ -14,13 +14,20 @@
     <div id="opcije">
         <div id="prosjecnaKvadratura">
             <h2>Prosječna kvadratura</h2>
+
             <label for="kvadraturaKriterij">Kriterij: </label>
             <select id="kvadraturaKriterij" name="kvadraturaKriterij" onchange="prikaziUnos('kvadratura')">
                 <option value="tip_nekretnine">Tip nekretnine</option>
-                <option value="min_kvadratura">Minimalna kvadratura</option>
-                <option value="max_kvadratura">Maksimalna kvadratura</option>
-                <option value="min_cijena">Minimalna cijena</option>
-                <option value="max_cijena">Maksimalna cijena</option>
+                <option value="id">ID nekretnine</option>
+                <option value="naziv">Naziv nekretnine</option>
+                <option value="raspon_kvadrature">Raspon kvadrature</option>
+                <option value="raspon_cijene">Raspon cijene</option>
+                <option value="tip_grijanja">Tip grijanja</option>
+                <option value="lokacija">Lokacija</option>
+                <option value="godina_izgradnje">Godina izgradnje (yyyy)</option>
+                <option value="datum_objave">Datum objave (dd.mm.yyyy.)</option>
+                <option value="opis">Opis nekretnine</option>
+                <option value="broj_upita">Broj upita</option>
             </select>
     
             <select id="tipNekretnineSelect" name="tipNekretnineSelect">
@@ -30,9 +37,17 @@
             </select>
     
             <input type="text" id="kvadraturaKriterijVrijednost" name="kvadraturaKriterijVrijednost" placeholder="Vrijednost kriterija">
-    
-            <br><br>
-            <button type="submit" class="mainBtn" onclick="prosjecnaKvadratura()">Izračunaj</button>
+            
+            <div>
+                <input type="text" id="kvadraturaKriterijMin" name="kvadraturaKriterijMin" placeholder="Minimalna vrijednost">
+                <input type="text" id="kvadraturaKriterijMax" name="kvadraturaKriterijMax" placeholder="Maksimalna vrijednost">
+            </div> 
+
+            <div class="buttons">
+                <button type="submit" onclick="dodajKriterijProsjecnaKvadratura()" class="unosButton">Dodaj kriterij</button>
+                <button type="submit" class="mainBtn" onclick="prosjecnaKvadratura()">Izračunaj</button>
+                <button type="submit" onclick="resetProsjecnaKvadratura()" class="unosButton">Reset</button>
+            </div>
     
             <div id="prosjecnaKvadraturaOdgovor">
             </div>
@@ -40,13 +55,20 @@
 
         <div id="outlier">
             <h2>Outlier</h2>
+
             <label for="outlierKriterij">Kriterij: </label>
             <select id="outlierKriterij" name="outlierKriterij" onchange="prikaziUnos('outlier')">
                 <option value="tip_nekretnine">Tip nekretnine</option>
-                <option value="min_kvadratura">Minimalna kvadratura</option>
-                <option value="max_kvadratura">Maksimalna kvadratura</option>
-                <option value="min_cijena">Minimalna cijena</option>
-                <option value="max_cijena">Maksimalna cijena</option>
+                <option value="id">ID nekretnine</option>
+                <option value="naziv">Naziv nekretnine</option>
+                <option value="raspon_kvadrature">Raspon kvadrature</option>
+                <option value="raspon_cijene">Raspon cijene</option>
+                <option value="tip_grijanja">Tip grijanja</option>
+                <option value="lokacija">Lokacija</option>
+                <option value="godina_izgradnje">Godina izgradnje (yyyy)</option>
+                <option value="datum_objave">Datum objave (dd.mm.yyyy.)</option>
+                <option value="opis">Opis nekretnine</option>
+                <option value="broj_upita">Broj upita</option>
             </select>
     
             <select id="outlierTipNekretnineSelect" name="outlierTipNekretnineSelect">
@@ -56,17 +78,24 @@
             </select>
     
             <input type="text" id="outlierKriterijVrijednost" name="outlierKriterijVrijednost" placeholder="Vrijednost kriterija">
+
+            <div>
+                <input type="text" id="outlierKriterijMin" name="outlierKriterijMin" placeholder="Minimalna vrijednost">
+                <input type="text" id="outlierKriterijMax" name="outlierKriterijMax" placeholder="Maksimalna vrijednost">
+            </div>
     
-            <br><br>
             <label for="svojstvoSelect">Svojstvo: </label>
             <select id="svojstvoSelect" name="svojstvoSelect">
                 <option value="kvadratura">Kvadratura</option>
                 <option value="cijena">Cijena</option>
                 <option value="godina_izgradnje">Godina izgradnje</option>
             </select>
-    
-            <br><br>
-            <button type="submit" class="mainBtn" onclick="outlier()">Daj outlier</button>
+            
+            <div class="buttons">
+                <button type="submit" onclick="dodajKriterijOutlier()" class="unosButton">Dodaj kriterij</button>
+                <button type="submit" class="mainBtn" onclick="outlier()">Daj outlier</button>
+                <button type="submit" onclick="resetOutlier()" class="unosButton">Reset</button>
+            </div>
     
             <div id="outlierOdgovor">
             </div>
@@ -74,13 +103,12 @@
 
         <div id="mojeNekretnine">
             <h2>Moje nekretnine</h2>
-            <label for="idUnos">ID korisnika: </label>
-            <input type="text" id="idUnos" name="idUnos">
+
+            <label for="username">Username: </label>
+            <input type="text" id="username" name="username">
     
-            <br><br>
             <button type="submit" class="mainBtn" onclick="mojeNekretnine()">Pretraži</button>
     
-            <br><br>
             <div id="mojeNekretnineOdgovor">
             </div>
         </div>
@@ -89,6 +117,7 @@
     <div id="glavni">
         <div id="unosParametara">
             <h2>Histogram: cijene kroz periode</h2>
+
             <div class="unos">
                 <h3>Period</h3>
                 <br>
@@ -97,7 +126,7 @@
                 <label for="doPeriod">Do: </label>
                 <input type="text" id="doPeriod" name="doPeriod">
                 <br>
-                <button type="submit" onclick="dodajPeriod()">Dodaj period</button>
+                <button type="submit" onclick="dodajPeriod()" class="unosButton">Dodaj period</button>
             </div>
         
             <div class="unos">
@@ -108,7 +137,7 @@
                 <label for="doCijena">Do: </label>
                 <input type="text" id="doCijena" name="doCijena">
                 <br>
-                <button type="submit" onclick="dodajRaspon()">Dodaj raspon</button>
+                <button type="submit" onclick="dodajRaspon()" class="unosButton">Dodaj raspon</button>
             </div>
     
             <br>
