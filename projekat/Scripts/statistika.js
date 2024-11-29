@@ -263,6 +263,8 @@ function prikaziUnos(tip){
         else{
             document.getElementById("kvadraturaKriterijVrijednost").style.display = "inline";
         }
+
+        document.getElementById("kvadraturaMainBtn").disabled = true;
     }
     else if(tip == 'outlier'){
         let kriterij = document.getElementById("outlierKriterij").value;
@@ -281,6 +283,8 @@ function prikaziUnos(tip){
         else{
             document.getElementById("outlierKriterijVrijednost").style.display = "inline";
         }
+
+        document.getElementById("outlierMainBtn").disabled = true;
     }
 }
 
@@ -362,6 +366,7 @@ function dodajKriterijProsjecnaKvadratura(){
     }
 
     ukloniKriterijProsjecnaKvadratura(kriterij);
+    document.getElementById("kvadraturaMainBtn").disabled = false;
 }
 
 function ukloniKriterijProsjecnaKvadratura(kriterij){
@@ -394,6 +399,8 @@ function resetProsjecnaKvadratura(){
     document.getElementById("kvadraturaKriterijVrijednost").style.display = "none";
     document.getElementById("kvadraturaKriterijMin").style.display = "none";
     document.getElementById("kvadraturaKriterijMax").style.display = "none";
+
+    document.getElementById("kvadraturaMainBtn").disabled = false;
 }
 
 function prosjecnaKvadratura(){
@@ -407,15 +414,20 @@ function prosjecnaKvadratura(){
     statistika.init(filtriraneNekretnine, listaKorisnika);
     let result = statistika.prosjecnaKvadratura({});
 
-    if(result != -1){
-        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Prosječna kvadratura za zadani kriterij: " + result + "</p>";
+    if(result == 0){
+        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Ne postoji nekretnina za zadane kriterije!</p>";
+    }
+    else if(result == -1){
+        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Greška pri izračunu!</p>";
     }
     else{
-        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Greška pri izračunu!</p>";
+        document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "<p>Prosječna kvadratura za zadani kriterij: " + result + "</p>";
     }
 
     kriterijiProsjecnaKvadratura.length = 0;
     document.getElementById("kvadraturaKriterij").innerHTML = kvadraturaKriterijOpcije;
+    statistika.init(listaNekretnina, listaKorisnika);
+    spisak.init(listaNekretnina, listaKorisnika);
 }
 
 let kriterijiOutlier = [];
@@ -496,6 +508,7 @@ function dodajKriterijOutlier(){
     }
 
     ukloniKriterijOutlier(kriterij);
+    document.getElementById("outlierMainBtn").disabled = false;
 }
 
 function ukloniKriterijOutlier(kriterij){
@@ -528,6 +541,8 @@ function resetOutlier(){
     document.getElementById("outlierKriterijVrijednost").style.display = "none";
     document.getElementById("outlierKriterijMin").style.display = "none";
     document.getElementById("outlierKriterijMax").style.display = "none";
+
+    document.getElementById("outlierMainBtn").disabled = false;
 }
 
 function outlier(){     
@@ -555,6 +570,8 @@ function outlier(){
     document.getElementById("outlierOdgovor").innerHTML = htmlContent;
     kriterijiOutlier.length = 0;
     document.getElementById("outlierKriterij").innerHTML = outlierKriterijOpcije;
+    statistika.init(listaNekretnina, listaKorisnika);
+    spisak.init(listaNekretnina, listaKorisnika);
 }
 
 function mojeNekretnine(){

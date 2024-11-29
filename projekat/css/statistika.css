@@ -51,7 +51,7 @@ iframe {
   margin-right: 15px;
 }
 
-.mainBtn:hover {
+.mainBtn:enabled:hover {
   background-color: #f8af42;
 }
 
