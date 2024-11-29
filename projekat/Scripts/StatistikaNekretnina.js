@@ -7,10 +7,6 @@ let StatistikaNekretnina = function(){
     }
 
     let prosjecnaKvadratura = function(kriterij){
-        /*if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij)){
-            return -1;
-        }*/
-
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
 
         if(filtriraneNekretnine.length == 0){
@@ -26,11 +22,6 @@ let StatistikaNekretnina = function(){
     }
 
     let outlier = function(kriterij, nazivSvojstva){
-        /*if(!("tip_nekretnine" in kriterij || "min_kvadratura" in kriterij || "max_kvadratura" in kriterij || "min_cijena" in kriterij || "max_cijena" in kriterij) 
-            || !(nazivSvojstva == "kvadratura" || nazivSvojstva == "cijena" || nazivSvojstva == "godina_izgradnje")){
-            return null;
-        }*/
-
         let filtriraneNekretnine = spisakNekretnina.filtrirajNekretnine(kriterij);
 
         if(filtriraneNekretnine.length == 0){

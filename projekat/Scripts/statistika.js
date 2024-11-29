@@ -367,6 +367,7 @@ function dodajKriterijProsjecnaKvadratura(){
 
     ukloniKriterijProsjecnaKvadratura(kriterij);
     document.getElementById("kvadraturaMainBtn").disabled = false;
+    document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "";
 }
 
 function ukloniKriterijProsjecnaKvadratura(kriterij){
@@ -509,6 +510,7 @@ function dodajKriterijOutlier(){
 
     ukloniKriterijOutlier(kriterij);
     document.getElementById("outlierMainBtn").disabled = false;
+    document.getElementById("prosjecnaKvadraturaOdgovor").innerHTML = "";
 }
 
 function ukloniKriterijOutlier(kriterij){
@@ -564,7 +566,7 @@ function outlier(){
         htmlContent += "<p>Nema outliera za zadane kriterije!</p>"
     }
     else{
-        htmlContent += "<p>Tip nekretnine: " + result.tip_nekretnine + "</p><p>Naziv: " + result.naziv + "</p><p>Kvadratura: " + result.kvadratura + "</p><p>Cijena: " + result.cijena + "</p>";
+        htmlContent += "<p>Id: " + result.id + "</p><p>Tip nekretnine: " + result.tip_nekretnine + "</p><p>Naziv: " + result.naziv + "</p><p>Kvadratura: " + result.kvadratura + "</p><p>Cijena: " + result.cijena + "</p>";
     }
 
     document.getElementById("outlierOdgovor").innerHTML = htmlContent;
