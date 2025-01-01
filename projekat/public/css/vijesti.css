@@ -7,9 +7,11 @@ body {
 }
 
 iframe {
+    /* izbaceno position:fixed; */
     border: none; 
     width: 100%;
-    height: fit-content;
+    height: 80px;
+    top: 0;
 }
 
 #vijesti {
