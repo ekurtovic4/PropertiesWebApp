@@ -75,38 +75,16 @@ iframe {
   background-color: white;
 }
 
-@media only screen and (min-width : 800px) {
-  #upiti {
-    display: flex;
-  }
-
-  .upit {
-    width: 50%;
-    margin-right: 10px;
-    margin-left: 10px;
-  }
-}
-
-.nazad-button {
-  display: none;
+.nazad-button, .naprijed-button {
+  display: inline-block;
+  color: white;
+  background-color: #333;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .naprijed-button {
-  display: none;
-}
-
-@media only screen and (max-width : 600px) {
-  .nazad-button, .naprijed-button {
-    display: inline-block;
-    color: white;
-    background-color: #333;
-    font-weight: bold;
-    font-size: 16px;
-  }
-
-  .naprijed-button {
-    float: right;
-  }
+  float: right;
 }
 
 #buttons {

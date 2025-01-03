@@ -1,11 +1,7 @@
 let indeks = 0;
-let sviElementi = document.querySelectorAll(".upit");
-let prviPoziv = true;
+let sviElementi = [];
 
-if(prviPoziv){
-    setUpiti();
-    prviPoziv = false;
-} 
+let idNekretnine = 2; //hardkodirano ***
 
 function carousel(direction){
     let glavniElement = document.getElementById("upiti");
@@ -25,21 +21,41 @@ function carousel(direction){
 function setUpiti(){
     let htmlContent = "";
 
-    if(window.innerWidth > 600){    
-        for(element of sviElementi){
-            htmlContent += "<div class=\"upit\">";
-            htmlContent += element.innerHTML;
-            htmlContent += "</div>";
-        }
-    }
-    else{    
-        htmlContent += "<div class=\"upit\">";
-        htmlContent += sviElementi[indeks].innerHTML;
-        htmlContent += "</div>";
-    }
+    htmlContent += "<div class=\"upit\">";
+    htmlContent += sviElementi[indeks].innerHTML;
+    htmlContent += "</div>";
 
     let glavniElement = document.getElementById("upiti");
         glavniElement.innerHTML = htmlContent;
 }
 
-window.addEventListener('resize', () => { setUpiti(); });
+window.onload = async function() {
+    let nekretnina = await new Promise((resolve, reject) => {
+        PoziviAjax.getNekretnina(idNekretnine, (error, data) => {
+            if(data) resolve(data);
+            else reject(error);
+        });
+    });
+
+    for(upit of nekretnina.upiti) {
+        let korisnik = await new Promise((resolve, reject) => {
+            PoziviAjax.getKorisnikById(upit.korisnik_id, (error, data) => {
+                if(data) resolve(data);
+                else reject(error);
+            });
+        });
+
+        if(korisnik) {
+            let username = korisnik.username;
+            let upitDiv = document.createElement('div');
+            upitDiv.classList.add('upit');
+            upitDiv.innerHTML = `
+                <p><strong>${username}:</strong></p>
+                <p>${upit.tekst_upita}</p>
+            `;
+            sviElementi.push(upitDiv);
+        }
+    }
+
+    setUpiti();
+}

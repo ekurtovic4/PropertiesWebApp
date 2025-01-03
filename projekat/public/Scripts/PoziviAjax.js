@@ -186,12 +186,132 @@ const PoziviAjax = (() => {
         ajax.send()
     }
 
+    function getTop5Nekretnina(lokacija, fnCallback) {
+        let lokacijaParam = encodeURIComponent(lokacija);
+        
+        ajaxRequest('GET', '/nekretnine/top5?lokacija=' + lokacijaParam, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const nekretnine = JSON.parse(data);
+                    fnCallback(null, nekretnine);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
+    function getMojiUpiti(fnCallback) {
+        let ajax = new XMLHttpRequest();
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    try{
+                        fnCallback(null, JSON.parse(ajax.responseText));
+                    } catch (parseError) {
+                        fnCallback(parseError, null);
+                    } 
+                } 
+                else if (ajax.status == 401) {
+                    fnCallback({ status: 401, statusText: 'Neautorizovan pristup!' }, null);
+                } 
+                else if(ajax.status == 404) {
+                    fnCallback({ status: 404, statusText: 'Nema upita za ovog korisnika!' }, null);
+                } 
+                else {
+                    fnCallback({ status: xhr.status, statusText: xhr.statusText }, null);                    
+                }
+            }
+        };
+
+        ajax.open("GET", "http://localhost:3000/upiti/moji", true);
+        ajax.setRequestHeader("Content-Type", "application/json");
+        ajax.send();
+    }
+
+    function getNekretnina(nekretnina_id, fnCallback) {
+        let idParam = encodeURIComponent(nekretnina_id);
+
+        ajaxRequest('GET', '/nekretnina/' + idParam, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const nekretnina = JSON.parse(data);
+                    fnCallback(null, nekretnina);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
+    function getNextUpiti(nekretnina_id, page, fnCallback) {
+        let ajax = new XMLHttpRequest();
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    try{
+                        fnCallback(null, JSON.parse(ajax.responseText));
+                    } catch (parseError) {
+                        fnCallback(parseError, null);
+                    } 
+                } 
+                else if (ajax.status == 401) {
+                    fnCallback({ status: 401, statusText: 'Neautorizovan pristup!' }, null);
+                } 
+                else if(ajax.status == 404) {
+                    fnCallback({ status: 404, statusText: 'Nema upita na traženom page-u!' }, null);
+                } 
+                else {
+                    fnCallback({ status: xhr.status, statusText: xhr.statusText }, null);                    
+                }
+            }
+        };
+
+        let pageParam = encodeURIComponent(page);
+        let idParam = encodeURIComponent(nekretnina_id);
+        ajax.open("GET", "http://localhost:3000/next/upiti/nekretnina/" + idParam + "?page=" + pageParam, true);
+        ajax.setRequestHeader("Content-Type", "application/json");
+        ajax.send();
+    }
+
+    //dodano za potrebe detalji.js
+
+    function getKorisnikById(korisnik_id, fnCallback) {
+        let idParam = encodeURIComponent(korisnik_id);
+
+        ajaxRequest('GET', '/korisnik/' + idParam, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const korisnik = JSON.parse(data);
+                    fnCallback(null, korisnik);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
+    //============================
+
     return {
         postLogin: impl_postLogin,
         postLogout: impl_postLogout,
         getKorisnik: impl_getKorisnik,
         putKorisnik: impl_putKorisnik,
         postUpit: impl_postUpit,
-        getNekretnine: impl_getNekretnine
+        getNekretnine: impl_getNekretnine,
+        getTop5Nekretnina: getTop5Nekretnina,
+        getMojiUpiti: getMojiUpiti,
+        getNekretnina: getNekretnina,
+        getNextUpiti: getNextUpiti,
+        getKorisnikById: getKorisnikById
     };
 })();
