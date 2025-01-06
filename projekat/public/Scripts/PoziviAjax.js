@@ -71,8 +71,10 @@ const PoziviAjax = (() => {
         // Update user data with the provided values
         if (ime) loggedInUser.ime = ime;
         if (prezime) loggedInUser.prezime = prezime;
-        if (username) loggedInUser.adresa = adresa;
-        if (password) loggedInUser.brojTelefona = brojTelefona;
+        //if (username) loggedInUser.adresa = adresa;
+        //if (password) loggedInUser.brojTelefona = brojTelefona;
+        if (username) loggedInUser.username = username;
+        if (password) loggedInUser.password = password;
 
         // Save the updated user data back to the JSON file
         saveJsonFile('korisnici', users);
@@ -249,7 +251,7 @@ const PoziviAjax = (() => {
         });
     }
 
-    function getNextUpiti(nekretnina_id, page, fnCallback) {
+    function getNextUpiti(nekretnina_id, page, fnCallback) {        
         let ajax = new XMLHttpRequest();
 
         ajax.onreadystatechange = function () {
@@ -260,9 +262,6 @@ const PoziviAjax = (() => {
                     } catch (parseError) {
                         fnCallback(parseError, null);
                     } 
-                } 
-                else if (ajax.status == 401) {
-                    fnCallback({ status: 401, statusText: 'Neautorizovan pristup!' }, null);
                 } 
                 else if(ajax.status == 404) {
                     fnCallback({ status: 404, statusText: 'Nema upita na traženom page-u!' }, null);

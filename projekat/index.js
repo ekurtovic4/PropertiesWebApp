@@ -505,9 +505,7 @@ app.get('/nekretnina/:id', async (req, res) => {
     const nekretnine = await readJsonFile('nekretnine');
     const nekretnina = nekretnine.find(el => el.id == parseInt(id, 10));
 
-    if(nekretnina.upiti.length > 3){
-      nekretnina.upiti = nekretnina.upiti.reverse().slice(0, 3);
-    }
+    nekretnina.upiti = nekretnina.upiti.reverse().slice(0, 3);
 
     res.status(200).json(nekretnina);
   } catch (error) {
@@ -518,7 +516,7 @@ app.get('/nekretnina/:id', async (req, res) => {
 
 app.get('/next/upiti/nekretnina/:id', async(req, res) => {
   const { id } = req.params;
-  const page = req.query.page;
+  const page = parseInt(req.query.page);
 
   try{
     const nekretnine = await readJsonFile('nekretnine');

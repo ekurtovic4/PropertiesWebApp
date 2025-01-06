@@ -18,10 +18,6 @@
       {
         "korisnik_id": 2,
         "tekst_upita": "Phasellus viverra nulla."
-      },
-      {
-        "korisnik_id": 3,
-        "tekst_upita": "testni testni upit"
       }
     ]
   },
@@ -68,6 +64,50 @@
       {
         "korisnik_id": 2,
         "tekst_upita": "upit upit k2"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "tip_nekretnine": "Kuća",
+    "naziv": "Porodična kuća Sarajevo",
+    "kvadratura": 58,
+    "cijena": 232000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "01.10.2023.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "tip_nekretnine": "Poslovni prostor",
+    "naziv": "PP Novo Sarajevo",
+    "kvadratura": 58,
+    "cijena": 232000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "01.10.2023.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
       }
     ]
   }
