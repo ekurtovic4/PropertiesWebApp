@@ -505,6 +505,10 @@ app.get('/nekretnina/:id', async (req, res) => {
     const nekretnine = await readJsonFile('nekretnine');
     const nekretnina = nekretnine.find(el => el.id == parseInt(id, 10));
 
+    if(!nekretnina) {
+      return res.status(404).json({ greska: 'Nije pronađena nekretnina pod ovim id-em' });
+    }
+
     nekretnina.upiti = nekretnina.upiti.reverse().slice(0, 3);
 
     res.status(200).json(nekretnina);
@@ -517,6 +521,10 @@ app.get('/nekretnina/:id', async (req, res) => {
 app.get('/next/upiti/nekretnina/:id', async(req, res) => {
   const { id } = req.params;
   const page = parseInt(req.query.page);
+
+  if(isNaN(page) || page < 0) {
+    return res.status(404).json([]);
+  }
 
   try{
     const nekretnine = await readJsonFile('nekretnine');

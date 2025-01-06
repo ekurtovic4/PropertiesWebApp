@@ -235,20 +235,30 @@ const PoziviAjax = (() => {
     }
 
     function getNekretnina(nekretnina_id, fnCallback) {
-        let idParam = encodeURIComponent(nekretnina_id);
+        let ajax = new XMLHttpRequest();
 
-        ajaxRequest('GET', '/nekretnina/' + idParam, null, (error, data) => {
-            if (error) {
-                fnCallback(error, null);
-            } else {
-                try {
-                    const nekretnina = JSON.parse(data);
-                    fnCallback(null, nekretnina);
-                } catch (parseError) {
-                    fnCallback(parseError, null);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    try{
+                        fnCallback(null, JSON.parse(ajax.responseText));
+                    } catch (parseError) {
+                        fnCallback(parseError, null);
+                    } 
+                } 
+                else if(ajax.status == 404) {
+                    fnCallback({ status: 404, statusText: 'Nije pronađena nekretnina pod ovim id-em!' }, null);
+                } 
+                else {
+                    fnCallback({ status: xhr.status, statusText: xhr.statusText }, null);                    
                 }
             }
-        });
+        };
+
+        let idParam = encodeURIComponent(nekretnina_id);
+        ajax.open("GET", "http://localhost:3000/nekretnina/" + idParam, true);
+        ajax.setRequestHeader("Content-Type", "application/json");
+        ajax.send();
     }
 
     function getNextUpiti(nekretnina_id, page, fnCallback) {        
