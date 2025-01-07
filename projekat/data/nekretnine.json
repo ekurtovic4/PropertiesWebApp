@@ -76,7 +76,7 @@
     "tip_grijanja": "plin",
     "lokacija": "Novo Sarajevo",
     "godina_izgradnje": 2019,
-    "datum_objave": "01.10.2023.",
+    "datum_objave": "01.12.2017.",
     "opis": "Sociis natoque penatibus.",
     "upiti": [
       {
@@ -98,7 +98,7 @@
     "tip_grijanja": "plin",
     "lokacija": "Novo Sarajevo",
     "godina_izgradnje": 2019,
-    "datum_objave": "01.10.2023.",
+    "datum_objave": "05.10.2017.",
     "opis": "Sociis natoque penatibus.",
     "upiti": [
       {
@@ -108,6 +108,96 @@
       {
         "korisnik_id": 2,
         "tekst_upita": "Phasellus viverra nulla."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "tip_nekretnine": "Poslovni prostor",
+    "naziv": "Neki drugi PP Novo Sarajevo",
+    "kvadratura": 58,
+    "cijena": 232000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "22.11.2022.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "tip_nekretnine": "Kuća",
+    "naziv": "Neka kuća Novo Sarajevo",
+    "kvadratura": 58,
+    "cijena": 232000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "22.11.2009.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba malo ovdje"
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba treba uspjet"
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba treba uspjet jos sad"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "tip_nekretnine": "Stan",
+    "naziv": "Novi stan Novo Sarajevo",
+    "kvadratura": 58,
+    "cijena": 232000,
+    "tip_grijanja": "plin",
+    "lokacija": "Novo Sarajevo",
+    "godina_izgradnje": 2019,
+    "datum_objave": "02.01.2025.",
+    "opis": "Sociis natoque penatibus.",
+    "upiti": [
+      {
+        "korisnik_id": 1,
+        "tekst_upita": "Nullam eu pede mollis pretium."
+      },
+      {
+        "korisnik_id": 2,
+        "tekst_upita": "Phasellus viverra nulla."
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba"
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba 2"
+      },
+      {
+        "korisnik_id": 3,
+        "tekst_upita": "hajde proba sad 3"
       }
     ]
   }

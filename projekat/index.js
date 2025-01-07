@@ -81,11 +81,14 @@ If the data is correct, the username is saved in the session and a success messa
 */
 app.post('/login', async (req, res) => {
   let failedLogins, locked;
+  const jsonObj = req.body;
   
   if(req.session.locked != null){
     locked = req.session.locked;
 
     if(locked > Date.now()){
+      let newLine = `[${new Date()}] - username: ${jsonObj.username} - status: neuspješno`;
+      await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), newLine + '\r\n');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu' });
     }
     else{
@@ -105,8 +108,6 @@ app.post('/login', async (req, res) => {
     failedLogins = 0;
     req.session.failedLogins = failedLogins;
   }
-
-  const jsonObj = req.body;
 
   try {
     const data = await fs.readFile(path.join(__dirname, 'data', 'korisnici.json'), 'utf-8');
@@ -140,7 +141,7 @@ app.post('/login', async (req, res) => {
       loginLine += 'neuspješno';
       await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), loginLine + '\r\n');
 
-      if(failedLogins == 3){
+      if(failedLogins >= 3){
         req.session.locked = Date.now() + 60000;
         failedLogins = 0;
         req.session.failedLogins = failedLogins;
@@ -224,7 +225,6 @@ Allows logged user to make a request for a property
 */
 app.post('/upit', async (req, res) => {
   // Check if the user is authenticated
-  //if (!req.session.user) {  jer se u session pohranjuje username
   if (!req.session.username) {
     // User is not logged in
     return res.status(401).json({ greska: 'Neautorizovan pristup' });
@@ -241,20 +241,19 @@ app.post('/upit', async (req, res) => {
     const nekretnine = await readJsonFile('nekretnine');
 
     // Find the user by username
-    //const loggedInUser = users.find((user) => user.username === req.session.user.username);  jer se u session pohranjuje username
     const loggedInUser = users.find((user) => user.username === req.session.username);
 
     // Check if the property with nekretnina_id exists
     const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
 
-    let upitiZaUsera = nekretnina.upiti.filter(el => el["korisnik_id"] == loggedInUser.id);
-    if (upitiZaUsera.length >= 3){
-      return res.status(429).json({ greska: "Previse upita za istu nekretninu." });
-    }
-
     if (!nekretnina) {
       // Property not found
       return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
+    }
+
+    let upitiZaUsera = nekretnina.upiti.filter(el => el["korisnik_id"] == loggedInUser.id);
+    if (upitiZaUsera.length >= 3){
+      return res.status(429).json({ greska: "Previse upita za istu nekretninu." });
     }
 
     // Add a new query to the property's queries array
@@ -549,24 +548,19 @@ app.get('/korisnik/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Read user data from the JSON file
     const users = await readJsonFile('korisnici');
-
-    // Find the user by username
     const user = users.find((u) => u.id == id);
 
     if (!user) {
-      // User not found (should not happen if users are correctly managed)
       return res.status(401).json({ greska: 'Neautorizovan pristup' });
     }
 
-    // Send user data
     const userData = {
       id: user.id,
       ime: user.ime,
       prezime: user.prezime,
       username: user.username,
-      password: user.password // Should exclude the password for security reasons
+      password: user.password 
     };
 
     res.status(200).json(userData);

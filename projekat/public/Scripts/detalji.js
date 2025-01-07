@@ -65,13 +65,13 @@ window.onload = async function() {
         kolona2Div.appendChild(godinaIzgradnjeP);
 
         const datumObjaveP = document.createElement('p');
-        datumObjaveP.innerHTML = `<strong>Datum objave oglasa:</strong>${nekretnina.datum_objave}`;
+        datumObjaveP.innerHTML = `<strong>Datum objave oglasa:</strong> ${nekretnina.datum_objave}`;
         kolona2Div.appendChild(datumObjaveP);
 
         //opis
         let opisDiv = document.getElementById('opis');
         const opisP = document.createElement('p');
-        opisP.innerHTML = `<strong>Opis:</strong>${nekretnina.opis}`;
+        opisP.innerHTML = `<strong>Opis:</strong> ${nekretnina.opis}`;
         opisDiv.appendChild(opisP);
 
         for(let upit of nekretnina.upiti) {
@@ -128,7 +128,6 @@ async function carousel(direction){
 
 function setUpiti(){
     let htmlContent = "";
-
     htmlContent += "<div class=\"upit\">";
     htmlContent += sviElementi[indeks].innerHTML;
     htmlContent += "</div>";
@@ -143,7 +142,7 @@ async function getNextUpiti() {
             PoziviAjax.getNextUpiti(idNekretnine, page, (error, data) => {
                 if(data) resolve(data);
                 else reject(error);
-            })
+            });
         });
 
         for(let upit of upiti) {
