@@ -35,13 +35,14 @@ window.onload = function () {
   
     // Dodajte event listener za opciju "Odjava"
     const odjavaLink = document.getElementById('odjavaLink');
-    odjavaLink.addEventListener('click', function () {
+    odjavaLink.addEventListener('click', function (event) {
+      event.preventDefault();
       PoziviAjax.postLogout(function (err, data) {
         if (err != null) {
           window.alert(err);
         } else {
           // Redirektujem se nazad na pocetnu stranicu prijava.html
-          window.location.href = "http://localhost:3000/prijava.html";
+          window.top.location.href = "http://localhost:3000/prijava.html";
         }
   
         // Update menu for login status inside the callback
