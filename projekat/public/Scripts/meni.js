@@ -5,6 +5,7 @@ window.onload = function () {
       const profilLink = document.getElementById('profilLink');
       const nekretnineLink = document.getElementById('nekretnineLink');
       const prijavaLink = document.getElementById('prijavaLink');
+      const vijestiLink = document.getElementById('vijestiLink');
       const mojiUpitiLink = document.getElementById('mojiUpitiLink');
       const odjavaLink = document.getElementById('odjavaLink');
   
@@ -13,12 +14,14 @@ window.onload = function () {
         profilLink.style.display = 'block';
         nekretnineLink.style.display = 'block';
         prijavaLink.style.display = 'none';
+        vijestiLink.style.display = 'block';
         mojiUpitiLink.style.display = 'block';
         odjavaLink.style.display = 'block';
       } else {
         profilLink.style.display = 'none';
         nekretnineLink.style.display = 'block';
         prijavaLink.style.display = 'block';
+        vijestiLink.style.display = 'block';
         mojiUpitiLink.style.display = 'none';
         odjavaLink.style.display = 'none';
       }

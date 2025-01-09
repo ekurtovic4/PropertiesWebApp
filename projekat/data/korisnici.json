@@ -12,5 +12,12 @@
         "prezime": "Nekic2",
         "username": "username2",
         "password": "$2b$10$eN2a0Ii0mkjvpSUU.6.S4uASuULIlAspWFc2LkJTmIYPZszB8oyXC"
+    },
+    {
+        "id": 3,
+        "ime": "Probni",
+        "prezime": "Korisnik",
+        "username": "probniKorisnik",
+        "password": "$2a$10$0ZwWbBXaTDqmPMaWDVifHOrh5NCpAbnFa..MNs2ZXgHPwUMWdtRVC"
     }
 ]
