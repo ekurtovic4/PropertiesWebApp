@@ -10,12 +10,9 @@ window.onload =function(){
             if(err != null){
                 if(err.status == 429) {
                     var divElement=document.getElementById("areaBelow");
-                    divElement.innerHTML="<h2>Previše neuspješnih pokušaja! Pokušajte ponovo za 1 minutu.</h2>";
-                    window.alert(err.statusText);
+                    divElement.innerHTML="<h2>Previše neuspješnih pokušaja! Pokušajte ponovo za 1 minutu.</h2>"; 
                 }
-                else{
-                    window.alert(err);
-                }
+                window.alert(err.statusText);
             }
             else{
                 var message=JSON.parse(data)
