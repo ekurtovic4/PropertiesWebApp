@@ -159,7 +159,7 @@ const PoziviAjax = (() => {
             }
             else if (ajax.readyState == 4) {
                 //desio se neki error
-                fnCallback(ajax.statusText, null)
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
             }
         }
         ajax.open("POST", "http://localhost:3000/login", true)
