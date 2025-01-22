@@ -15,18 +15,15 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
         tableName: 'Nekretnina'
-    },
-    {
-        instanceMethods: {
-            async getInteresovanja() {
-                const upiti = await this.getUpiti();
-                const zahtjevi = await this.getZahtjevi();
-                const ponude = await this.getPonude();
-
-                return upiti.concat(zahtjevi, ponude);
-            }
-        }
     });
+
+    Nekretnina.prototype.getInteresovanja = async function() {
+        const upiti = await this.getUpiti();
+        const zahtjevi = await this.getZahtjevi();
+        const ponude = await this.getPonude();
+
+        return upiti.concat(zahtjevi, ponude);
+    };
     
-   return Nekretnina;
+    return Nekretnina;
 }

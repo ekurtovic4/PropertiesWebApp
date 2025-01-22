@@ -505,6 +505,54 @@ app.get('/next/upiti/nekretnina/:id', async(req, res) => {
   }
 });
 
+
+app.get('/nekretnina/:id/interesovanja', async(req, res) => {
+  const { id } = req.params;
+
+  try {
+    const nekretnina = await baza.nekretnina.findOne({ where: {id: id} });
+    if(!nekretnina){
+      return res.status(404).json({ greska: 'Nije pronađena nekretnina pod ovim id-em' });
+    }
+
+    let interesovanja = await nekretnina.getInteresovanja();
+    interesovanja = interesovanja.map(i => i.toJSON());
+
+    if(!req.session.username){
+      interesovanja = interesovanja.map(i => {
+        if("cijenaPonude" in i){
+          delete i.cijenaPonude;
+        }
+        return i;
+      });
+    }
+    else{
+      const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
+
+      if(!korisnik.admin){
+        interesovanja = await Promise.all(
+          interesovanja.map(async i => {
+            if("cijenaPonude" in i && korisnik.id != i.korisnik_id){
+              const vezanaPonuda = await baza.ponuda.findOne({ where: {id: i.vezana_ponuda_id} });
+  
+              if(!vezanaPonuda || korisnik.id != vezanaPonuda.korisnik_id){
+                delete i.cijenaPonude;
+              }
+            }
+            return i;
+          })
+        ); 
+      }
+    }
+
+    return res.status(200).json(interesovanja);
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 //dodano za potrebe detalji.js
 
 app.get('/korisnik/:id', async (req, res) => {

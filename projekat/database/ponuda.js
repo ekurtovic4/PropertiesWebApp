@@ -19,22 +19,19 @@ module.exports = function (sequelize, DataTypes) {
     },
     {
         tableName: 'Ponuda'
-    },
-    {
-        instanceMethods: {
-            async getVezanePonude() {
-                const ponude = await Ponuda.findAll({ 
-                    where: {
-                        [Sequelize.Op.and]: [
-                            {vezana_ponuda_id: this.vezana_ponuda_id}, 
-                            {id: {[Sequelize.Op.ne]: this.id}}
-                        ]
-                    } 
-                });
-                return ponude;
-            }
-        }
     });
+
+    Ponuda.prototype.getVezanePonude = async function() {
+        const ponude = await Ponuda.findAll({ 
+            where: {
+                [Sequelize.Op.and]: [
+                    {vezana_ponuda_id: this.vezana_ponuda_id}, 
+                    {id: {[Sequelize.Op.ne]: this.id}}
+                ]
+            } 
+        });
+        return ponude;
+    };
     
-   return Ponuda;
+    return Ponuda;
 }
