@@ -5,8 +5,8 @@ window.onload = function() {
 
             for(upit of data) {
                 htmlContent += "<div class=\"upit\">";
-                htmlContent += "<p> ID nekretnine: " + upit.id_nekretnine + "</p>";
-                htmlContent += "<p> Upit: " + upit.tekst_upita + "</p>";
+                htmlContent += "<p> ID nekretnine: " + upit.nekretnina_id + "</p>";
+                htmlContent += "<p> Upit: " + upit.tekst + "</p>";
                 htmlContent += "</div>";
             }
 

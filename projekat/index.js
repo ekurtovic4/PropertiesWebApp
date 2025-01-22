@@ -7,6 +7,9 @@ const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 3000;
 
+const baza = require('./database/baza');
+const { Sequelize } = require('sequelize');
+
 app.use(session({
   secret: 'tajna sifra',
   resave: true,
@@ -55,7 +58,7 @@ routes.forEach(({ route, file }) => {
 /* ----------- SERVING OTHER ROUTES --------------- */
 
 // Async function for reading json data from data folder 
-async function readJsonFile(filename) {
+/*async function readJsonFile(filename) {
   const filePath = path.join(__dirname, 'data', `${filename}.json`);
   try {
     const rawdata = await fs.readFile(filePath, 'utf-8');
@@ -73,7 +76,7 @@ async function saveJsonFile(filename, data) {
   } catch (error) {
     throw error;
   }
-}
+}*/
 
 /*
 Checks if the user exists and if the password is correct based on korisnici.json data. 
@@ -110,20 +113,14 @@ app.post('/login', async (req, res) => {
   }
 
   try {
-    const data = await fs.readFile(path.join(__dirname, 'data', 'korisnici.json'), 'utf-8');
-    const korisnici = JSON.parse(data);
     let found = false;
 
-    for (const korisnik of korisnici) {
-      if (korisnik.username == jsonObj.username) {
-        const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
+    const korisnik = await baza.korisnik.findOne({ where: {username: jsonObj.username} });
+    const isPasswordMatched = await bcrypt.compare(jsonObj.password, korisnik.password);
 
-        if (isPasswordMatched) {
-          req.session.username = korisnik.username;
-          found = true;
-          break;
-        }
-      }
+    if (isPasswordMatched) {
+      req.session.username = korisnik.username;
+      found = true;
     }
 
     let loginLine = `[${new Date()}] - username: ${jsonObj.username} - status: `;
@@ -193,11 +190,7 @@ app.get('/korisnik', async (req, res) => {
   const username = req.session.username;
 
   try {
-    // Read user data from the JSON file
-    const users = await readJsonFile('korisnici');
-
-    // Find the user by username
-    const user = users.find((u) => u.username === username);
+    const user = await baza.korisnik.findOne({ where: {username: username} });
 
     if (!user) {
       // User not found (should not happen if users are correctly managed)
@@ -234,36 +227,32 @@ app.post('/upit', async (req, res) => {
   const { nekretnina_id, tekst_upita } = req.body;
 
   try {
-    // Read user data from the JSON file
-    const users = await readJsonFile('korisnici');
-
-    // Read properties data from the JSON file
-    const nekretnine = await readJsonFile('nekretnine');
-
-    // Find the user by username
-    const loggedInUser = users.find((user) => user.username === req.session.username);
-
-    // Check if the property with nekretnina_id exists
-    const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
+    const loggedInUser = await baza.korisnik.findOne({ where: {username: req.session.username} });
+    const nekretnina = await baza.nekretnina.findOne({ where: {id: nekretnina_id} });
 
     if (!nekretnina) {
       // Property not found
       return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
     }
 
-    let upitiZaUsera = nekretnina.upiti.filter(el => el["korisnik_id"] == loggedInUser.id);
-    if (upitiZaUsera.length >= 3){
+    let upitiZaUsera = await baza.upit.findAll({ 
+      where: {
+        [Sequelize.Op.and]: [
+          {nekretnina_id: nekretnina_id},
+          {korisnik_id: loggedInUser.id}
+        ]
+      }
+    });
+
+    if (upitiZaUsera && upitiZaUsera.length >= 3){
       return res.status(429).json({ greska: "Previse upita za istu nekretninu." });
     }
 
-    // Add a new query to the property's queries array
-    nekretnina.upiti.push({
+    await baza.upit.create({
+      nekretnina_id: nekretnina_id,
       korisnik_id: loggedInUser.id,
-      tekst_upita: tekst_upita
+      tekst: tekst_upita
     });
-
-    // Save the updated properties data back to the JSON file
-    await saveJsonFile('nekretnine', nekretnine);
 
     res.status(200).json({ poruka: 'Upit je uspješno dodan' });
   } catch (error) {
@@ -286,11 +275,7 @@ app.put('/korisnik', async (req, res) => {
   const { ime, prezime, username, password } = req.body;
 
   try {
-    // Read user data from the JSON file
-    const users = await readJsonFile('korisnici');
-
-    // Find the user by username
-    const loggedInUser = users.find((user) => user.username === req.session.username);
+    const loggedInUser = await baza.korisnik.findOne({ where: {username: req.session.username} });
 
     if (!loggedInUser) {
       // User not found (should not happen if users are correctly managed)
@@ -307,8 +292,8 @@ app.put('/korisnik', async (req, res) => {
       loggedInUser.password = hashedPassword;
     }
 
-    // Save the updated user data back to the JSON file
-    await saveJsonFile('korisnici', users);
+    loggedInUser.save();
+
     res.status(200).json({ poruka: 'Podaci su uspješno ažurirani' });
   } catch (error) {
     console.error('Error updating user data:', error);
@@ -321,7 +306,7 @@ Returns all properties from the file.
 */
 app.get('/nekretnine', async (req, res) => {
   try {
-    const nekretnineData = await readJsonFile('nekretnine');
+    const nekretnineData = await baza.nekretnina.findAll();
     res.json(nekretnineData);
   } catch (error) {
     console.error('Error fetching properties data:', error);
@@ -332,7 +317,7 @@ app.get('/nekretnine', async (req, res) => {
 /* ----------------- MARKETING ROUTES ----------------- */
 
 // Route that increments value of pretrage for one based on list of ids in nizNekretnina
-app.post('/marketing/nekretnine', async (req, res) => {
+/*app.post('/marketing/nekretnine', async (req, res) => {
   const { nizNekretnina } = req.body;
 
   try {
@@ -436,27 +421,19 @@ app.post('/marketing/osvjezi/klikovi', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+*/
 
 app.get('/nekretnine/top5', async (req, res) => {
   let lokacija = req.query.lokacija;
 
   try{
-    let nekretnine = await readJsonFile('nekretnine');
-    let filtriraneNekretnine = nekretnine.filter(
-      el => el.lokacija == lokacija
-    ).sort(
-      (a, b) => {
-        const godine = parseInt(b["datum_objave"].substring(6, 10), 10) - parseInt(a["datum_objave"].substring(6, 10), 10);
-        if(godine != 0) return godine;
+    let nekretnine = await baza.nekretnina.findAll({
+      where: {lokacija: lokacija},
+      order: [['datum_objave', 'DESC']],
+      limit: 5
+    });
 
-        const mjeseci = parseInt(b["datum_objave"].substring(3, 5), 10) - parseInt(a["datum_objave"].substring(3, 5), 10);
-        if(mjeseci != 0) return mjeseci;
-
-        return parseInt(b["datum_objave"].substring(0, 2), 10) - parseInt(a["datum_objave"].substring(0, 2), 10);
-      }
-    );
-
-    res.status(200).json(filtriraneNekretnine.slice(0, 5));
+    res.status(200).json(nekretnine);
   } catch (error) {
     console.error('Greška prilikom dohvaćanja nekretnina za zadanu lokaciju:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -469,24 +446,11 @@ app.get('/upiti/moji', async (req, res) => {
   }
 
   try{
-    const users = await readJsonFile('korisnici');
-    const loggedInUser = users.find((user) => user.username === req.session.username);
-    const nekretnine = await readJsonFile('nekretnine');
-    let upiti = [];
+    const loggedInUser = await baza.korisnik.findOne({ where: {username: req.session.username} });
+    const upiti = await baza.upit.findAll({ where: {korisnik_id: loggedInUser.id} });
 
-    nekretnine.forEach(nekretnina => {
-      nekretnina.upiti.forEach(upit => {
-        if(upit.korisnik_id == loggedInUser.id) {
-          upiti.push({
-            id_nekretnine: nekretnina.id,
-            tekst_upita: upit.tekst_upita
-          });
-        }
-      });
-    });
-
-    if(upiti.length == 0){
-      return res.status(404).json(upiti);
+    if(!upiti){
+      return res.status(404).json([]);
     }
     else{
       return res.status(200).json(upiti);
@@ -501,16 +465,16 @@ app.get('/nekretnina/:id', async (req, res) => {
   const { id } = req.params;
 
   try{
-    const nekretnine = await readJsonFile('nekretnine');
-    const nekretnina = nekretnine.find(el => el.id == parseInt(id, 10));
+    const nekretnina = await baza.nekretnina.findOne({ where: { id: id } });
 
     if(!nekretnina) {
       return res.status(404).json({ greska: 'Nije pronađena nekretnina pod ovim id-em' });
     }
 
-    nekretnina.upiti = nekretnina.upiti.reverse().slice(0, 3);
+    let upiti = await baza.upit.findAll({ where: {nekretnina_id: id} });
+    upiti = upiti.reverse().slice(0, 3);
 
-    res.status(200).json(nekretnina);
+    res.status(200).json({ ...nekretnina.toJSON(), upiti });
   } catch (error) {
     console.error('Greška prilikom dohvaćanja nekretnina')
     res.status(500).json({ greska: 'Internal Server Error' });
@@ -526,10 +490,9 @@ app.get('/next/upiti/nekretnina/:id', async(req, res) => {
   }
 
   try{
-    const nekretnine = await readJsonFile('nekretnine');
-    const nekretnina = nekretnine.find(el => el.id == parseInt(id, 10));
+    const upiti = await baza.upit.findAll({ where: {nekretnina_id: id} });
 
-    let upitiPage = nekretnina.upiti.reverse().slice(3 * page, 3 * (page + 1));
+    let upitiPage = upiti.reverse().slice(3 * page, 3 * (page + 1));
     if(upitiPage.length != 0) {
       res.status(200).json(upitiPage);
     }
@@ -548,8 +511,7 @@ app.get('/korisnik/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const users = await readJsonFile('korisnici');
-    const user = users.find((u) => u.id == id);
+    const user = await baza.korisnik.findOne({ where: {id: id} });
 
     if (!user) {
       return res.status(401).json({ greska: 'Neautorizovan pristup' });
@@ -573,6 +535,17 @@ app.get('/korisnik/:id', async (req, res) => {
 //============================
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await baza.sequelize.sync({ force: false });
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  }
+  catch(error) {
+    console.error(`Error ${error} while starting server`);
+  }
+}
+
+startServer();

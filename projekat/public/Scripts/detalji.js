@@ -65,7 +65,12 @@ window.onload = async function() {
         kolona2Div.appendChild(godinaIzgradnjeP);
 
         const datumObjaveP = document.createElement('p');
-        datumObjaveP.innerHTML = `<strong>Datum objave oglasa:</strong> ${nekretnina.datum_objave}`;
+
+        const datumObjave = new Date(nekretnina.datum_objave);
+        const formatiranDatum = `${datumObjave.getDate().toString().padStart(2, '0')}.${(datumObjave.getMonth() + 1)
+            .toString().padStart(2, '0')}.${datumObjave.getFullYear()}.`;
+
+        datumObjaveP.innerHTML = `<strong>Datum objave oglasa:</strong> ${formatiranDatum}`;
         kolona2Div.appendChild(datumObjaveP);
 
         //opis
@@ -88,7 +93,7 @@ window.onload = async function() {
                 upitDiv.classList.add('upit');
                 upitDiv.innerHTML = `
                     <p><strong>${username}:</strong></p>
-                    <p>${upit.tekst_upita}</p>
+                    <p>${upit.tekst}</p>
                 `;
                 sviElementi.push(upitDiv);
 
@@ -159,7 +164,7 @@ async function getNextUpiti() {
                 upitDiv.classList.add('upit');
                 upitDiv.innerHTML = `
                     <p><strong>${username}:</strong></p>
-                    <p>${upit.tekst_upita}</p>
+                    <p>${upit.tekst}</p>
                 `;
                 sviElementi.push(upitDiv);
             }
