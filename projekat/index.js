@@ -553,6 +553,86 @@ app.get('/nekretnina/:id/interesovanja', async(req, res) => {
   }
 });
 
+app.post('/nekretnina/:id/ponuda', async(req, res) => {
+  const { id } = req.params;
+  const ponuda = req.body;
+
+  if(!req.session.username){
+    return res.status(401).json({ greska: 'Neautorizovan pristup' });
+  }
+
+  try{
+    const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
+    
+    let novaPonuda = {
+      nekretnina_id: parseInt(id, 10),
+      korisnik_id: korisnik.id,
+      tekst: ponuda.tekst,
+      cijenaPonude: ponuda.ponudaCijene,
+      datumPonude: new Date(ponuda.datumPonude),
+      odbijenaPonuda: ponuda.odbijenaPonuda 
+    };
+
+    if(ponuda.idVezanePonude == null){
+      novaPonuda.vezana_ponuda_id = null;
+    }
+    else{
+      let ponudaZaKojuJeVezana = await baza.ponuda.findOne({ where: {id: ponuda.idVezanePonude} });
+      
+      if(ponudaZaKojuJeVezana.odbijenaPonuda){
+        return res.status(400).json({ greska: 'Ne mogu se vezati nove ponude u lanac odbijenih ponuda!' });
+      }
+
+      if(ponudaZaKojuJeVezana.vezana_ponuda_id == null){
+        novaPonuda.vezana_ponuda_id = ponudaZaKojuJeVezana.id;
+
+        if(!korisnik.admin && ponudaZaKojuJeVezana.korisnik_id != korisnik.id){
+          return res.status(401).json({ greska: 'Neautorizovan pristup' });
+        }
+
+        if(ponuda.odbijenaPonuda){
+          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: ponudaZaKojuJeVezana.id} });
+
+          for(let vp of vezanePonude){
+            vp.odbijenaPonuda = true;
+            await vp.save();
+          }
+
+          ponudaZaKojuJeVezana.odbijenaPonuda = true;
+          await ponudaZaKojuJeVezana.save();
+        }
+      }
+      else{
+        let korijenskaPonuda = await baza.ponuda.findOne({ where: {id: ponudaZaKojuJeVezana.vezana_ponuda_id} });
+        novaPonuda.vezana_ponuda_id = korijenskaPonuda.id;
+
+        if(!korisnik.admin && korijenskaPonuda.korisnik_id != korisnik.id){
+          return res.status(401).json({ greska: 'Neautorizovan pristup' });
+        }
+
+        if(ponuda.odbijenaPonuda){
+          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: korijenskaPonuda.id} });
+
+          for(let vp of vezanePonude){
+            vp.odbijenaPonuda = true;
+            await vp.save();
+          }
+
+          korijenskaPonuda.odbijenaPonuda = true;
+          await korijenskaPonuda.save();
+        }
+      }
+    }
+
+    await baza.ponuda.create(novaPonuda);
+    res.status(200).json({ poruka: 'Uspješno dodana ponuda!' });
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 //dodano za potrebe detalji.js
 
 app.get('/korisnik/:id', async (req, res) => {
