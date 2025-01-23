@@ -633,6 +633,83 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
   }
 });
 
+app.post('/nekretnina/:id/zahtjev', async(req, res) => {
+  const { id } = req.params;
+  const zahtjev = req.body;
+
+  if(!req.session.username){
+    return res.status(401).json({ greska: 'Neautorizovan pristup' });
+  }
+
+  try{    
+    if(new Date(zahtjev.trazeniDatum) < Date.now()){
+      return res.status(404).json({ greska: 'Traženi datum ne može biti raniji od trenutnog datuma' });
+    }
+
+    const nekretnina = await baza.nekretnina.findOne({ where: {id: id} });
+    if(!nekretnina){
+      return res.status(404).json({ greska: 'Ne postoji nekretnina sa zadanim id-em' });
+    }
+
+    const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
+
+    let noviZahtjev = {
+      nekretnina_id: parseInt(id, 10),
+      korisnik_id: korisnik.id,
+      tekst: zahtjev.tekst,
+      trazeniDatum: new Date(zahtjev.trazeniDatum),
+      odobren: false
+    };
+
+    await baza.zahtjev.create(noviZahtjev);
+    res.status(200).json({ poruka: 'Uspješno dodan zahtjev!' });
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
+app.put('/nekretnina/:id/zahtjev/:zid', async(req, res) => {
+  const { id, zid } = req.params;
+  const odgovor = req.body;
+
+  if(!req.session.username){
+    return res.status(401).json({ greska: 'Neautorizovan pristup' });
+  }
+
+  try{
+    const nekretnina = await baza.nekretnina.findOne({ where: {id: id} });
+    if(!nekretnina){
+      return res.status(404).json({ greska: 'Ne postoji nekretnina sa zadanim id-em' });
+    }
+
+    let zahtjev = await baza.zahtjev.findOne({ where: {id: zid} });
+    if(!zahtjev){
+      return res.status(404).json({ greska: 'Ne postoji zahtjev sa zadanim id-em' });
+    }
+
+    const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
+    if(!korisnik.admin){
+      return res.status(401).json({ greska: 'Potrebne su administratorske privilegije' });
+    }
+
+    if(!odgovor.odobren && odgovor.addToTekst == null){
+      return res.status(400).json({ greska: 'Potrebno je proslijediti neki tekst ukoliko zahtjev nije odobren' });
+    }
+
+    zahtjev.odobren = odgovor.odobren;
+    zahtjev.tekst = zahtjev.tekst.concat(" ODGOVOR ADMINA: ", odgovor.addToTekst);
+    await zahtjev.save();
+
+    return res.status(200).json({ poruka: 'Uspješno izmjenjen zahtjev' });
+  }
+  catch(error) {
+    console.error(error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 //dodano za potrebe detalji.js
 
 app.get('/korisnik/:id', async (req, res) => {

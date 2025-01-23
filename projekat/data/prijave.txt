@@ -127,3 +127,6 @@
 [Thu Jan 23 2025 00:12:55 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: probniKorisnik - status: uspješno
 [Thu Jan 23 2025 00:25:33 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: probniKorisnik - status: uspješno
 [Thu Jan 23 2025 00:30:23 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
+[Thu Jan 23 2025 01:15:32 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
+[Thu Jan 23 2025 01:29:52 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
+[Thu Jan 23 2025 01:33:49 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
