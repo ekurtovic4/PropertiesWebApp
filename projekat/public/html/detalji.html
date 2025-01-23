@@ -33,12 +33,95 @@
         <button class="naprijed-button" onclick="carousel('right')">&gt;&gt;</button>
     </div>
 
+    <div id="dodavanjeInteresovanja">
+        <h3>NOVO INTERESOVANJE</h3>
+        <form>
+            <label for="tipSelect">Tip interesovanja: </label>
+            <select id="tipSelect" name="tipSelect" onchange="prikaziPoljaZaUnos()">
+                <option value="upit">Upit</option>
+                <option value="zahtjev">Zahtjev</option>
+                <option value="ponuda">Ponuda</option>
+            </select>
+        </form>
+        <br><br>
+
+        <div id="unosUpita">
+            <form>
+                <label for="tekstUpita">Tekst: </label>
+                <textarea id="tekstUpita" name="tekstUpita" rows="5" cols="30"></textarea>
+            </form>    
+            <br>     
+            <button id="postUpitButton" type="button">Pošalji</button>
+        </div>
+
+        <div id="unosZahtjeva">
+            <form>
+                <label for="tekstZahtjeva">Tekst: </label>
+                <textarea id="tekstZahtjeva" name="tekstZahtjeva" rows="5" cols="30"></textarea>
+                <br><br>
+                <label for="datumZahtjeva">Datum: </label>
+                <input type="date" id="datumZahtjeva" name="datumZahtjeva">
+            </form>
+            <br>
+            <button id="postZahtjevButton" type="button">Pošalji</button>
+        </div>
+
+        <div id="odgovorNaZahtjev">
+            <form>
+                <label for="idVezanogZahtjevaSelect">Odgovor na zahtjev: </label>
+                <select id="idVezanogZahtjevaSelect" name="idVezanogZahtjevaSelect">
+                </select>
+                <br><br>
+                <label>Odobren: </label>
+                <input type="radio" id="jeste_odobren" name="odobrenZahtjev" value="true">
+                <label for="jeste_odobren">DA</label>
+                <input type="radio" id="nije_odobren" name="odobrenZahtjev" value="false">
+                <label for="nije_odobren">NE</label>
+                <br><br>
+                <label for="addToTekst">Tekst: </label>
+                <textarea id="addToTekst" name="addToTekst" rows="5" cols="30"></textarea>
+            </form>
+            <br>
+            <button id="putZahtjevButton" type="button">Odgovori</button>
+        </div>
+        <br>
+        <div id="imaZahtjevaZaOdgovor">
+        </div>
+
+        <div id="unosPonude">
+            <form>
+                <label for="tekstPonude">Tekst: </label>
+                <textarea id="tekstPonude" name="tekstPonude" rows="5" cols="30"></textarea>
+                <br><br>
+                <label for="cijenaPonude">Cijena: </label>
+                <input type="number" id="cijenaPonude" name="cijenaPonude" min="0">
+                <br><br>
+                <label for="idVezanePonudeSelect">Id vezane ponude: </label>
+                <select id="idVezanePonudeSelect" name="idVezanePonudeSelect">
+                </select>
+                <br><br>
+                <label>Odbijena: </label>
+                <input type="radio" id="jeste_odbijena" name="odbijenaPonuda" value="true">
+                <label for="jeste_odbijena">DA</label>
+                <input type="radio" id="nije_odbijena" name="odbijenaPonuda" value="false">
+                <label for="nije_odbijena">NE</label>
+            </form>
+            <br>
+            <button id="postPonudaButton" type="button">Pošalji</button>
+        </div>
+
+        <br>
+        <div id="odgovorNakonPost">
+        </div>
+    </div>
+
+    <div id="top5Main">
+    </div>
+
     <script type="text/javascript" src="../Scripts/detalji.js"></script>
     <script type="text/javascript" src="../Scripts/carousel.js"></script>
     <script type="text/javascript" src="../scripts/PoziviAjax.js"></script>
 
-    <div id="top5Main">
-    </div>
 </body>
 
 </html>

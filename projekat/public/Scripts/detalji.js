@@ -3,6 +3,7 @@ let sviElementi = [];
 let idNekretnine = 0; 
 let page = 0;
 let dosloDoKraja = false;
+let loggedInUserIsAdmin = false;
 
 window.onload = async function() {
     let params = new URLSearchParams(window.location.search);
@@ -103,6 +104,32 @@ window.onload = async function() {
                 console.error("Greška prilikom učitavanja korisnika za upit");
             }
         }
+
+        let dodavanjeInteresovanja = document.getElementById("dodavanjeInteresovanja");
+
+        PoziviAjax.getKorisnik(function(err, data) {
+            if(err){
+                dodavanjeInteresovanja.style.display = 'none';
+            }
+            else{
+                dodavanjeInteresovanja.style.display = 'block';
+                let unosUpita = document.getElementById("unosUpita");
+                let unosZahtjeva = document.getElementById("unosZahtjeva");
+                let odgovorNaZahtjev = document.getElementById("odgovorNaZahtjev");
+                let unosPonude = document.getElementById("unosPonude");
+                let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+                let imaZahtjevaZaOdgovor = document.getElementById("imaZahtjevaZaOdgovor");
+        
+                unosUpita.style.display = 'block';
+                unosZahtjeva.style.display = 'none';
+                unosPonude.style.display = 'none';
+                odgovorNaZahtjev.style.display = 'none';
+                odgovorNakonPost.style.display = 'none';
+                imaZahtjevaZaOdgovor.style.display = 'none';
+
+                loggedInUserIsAdmin = data.admin;
+            }
+        });
     }
     catch(error) {
         console.error("Greška prilikom učitavanja nekretnine");
@@ -241,5 +268,212 @@ function getTop5Nekretnina(){
                 top5Div.appendChild(nekretninaElement);
             }
         }
+    });
+}
+
+function prikaziPoljaZaUnos(){
+    let tip = document.getElementById("tipSelect").value;
+    let unosUpita = document.getElementById("unosUpita");
+    let unosZahtjeva = document.getElementById("unosZahtjeva");
+    let odgovorNaZahtjev = document.getElementById("odgovorNaZahtjev");
+    let unosPonude = document.getElementById("unosPonude");
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+    let imaZahtjevaZaOdgovor = document.getElementById("imaZahtjevaZaOdgovor");
+
+    unosUpita.style.display = 'none';
+    unosZahtjeva.style.display = 'none';
+    odgovorNaZahtjev.style.display = 'none';
+    unosPonude.style.display = 'none';
+    odgovorNakonPost.style.display = 'none';
+    imaZahtjevaZaOdgovor.style.display = 'none';
+
+    if(tip == "upit"){
+        unosUpita.style.display = 'block';
+    }
+    else if(tip == "zahtjev"){
+        if(loggedInUserIsAdmin){
+            updateZahtjevi();
+        }
+        else{
+            unosZahtjeva.style.display = 'block';
+        }
+    }
+    else{
+        updatePonude();
+        unosPonude.style.display = 'block';
+    }
+}
+
+function updatePonude(){
+    PoziviAjax.getPonudeForKorisnik(idNekretnine, function(err, data){
+        if(err){
+            if(err.status == 404){
+                document.getElementById("idVezanePonudeSelect").disabled = true;
+            }
+            else{
+                let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+                odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
+                odgovorNakonPost.display.style = 'block';
+            }
+        }
+        else{
+            let idVezanePonudeSelect = document.getElementById("idVezanePonudeSelect");
+            idVezanePonudeSelect.innerHTML = '';
+
+            data.forEach(p => {
+                const idPonudeOption = document.createElement("option");
+                idPonudeOption.value = p.id;
+                idPonudeOption.textContent = p.id;
+                idVezanePonudeSelect.appendChild(idPonudeOption);
+            });
+
+            idVezanePonudeSelect.disabled = false;
+        }
+    });
+}
+
+
+let postUpitButton = document.getElementById("postUpitButton");
+postUpitButton.onclick = function(){
+    let tekstUpita = document.getElementById("tekstUpita").value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    PoziviAjax.postUpit(idNekretnine, tekstUpita, function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`  
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>'
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstUpita").value = '';
+    });
+}
+
+let postZahtjevButton = document.getElementById("postZahtjevButton");
+postZahtjevButton.onclick = function(){
+    let tekstZahtjeva = document.getElementById("tekstZahtjeva").value;
+    let datumZahtjeva = document.getElementById("datumZahtjeva").value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    if(new Date(datumZahtjeva) < Date.now()){
+        odgovorNakonPost.innerHTML = `<h2>Datum ne može biti raniji od današnjeg! Odaberite drugi datum.</h2>`;
+        odgovorNakonPost.style.display = 'block';
+        return;
+    }
+
+    PoziviAjax.postZahtjev(idNekretnine, tekstZahtjeva, datumZahtjeva, function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>` 
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>'
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstZahtjeva").value = '';
+        document.getElementById("datumZahtjeva").value = '';
+    })
+}
+
+let postPonudaButton = document.getElementById("postPonudaButton");
+postPonudaButton.onclick = function(){
+    let tekstPonude = document.getElementById("tekstPonude").value;
+    let cijenaPonude = document.getElementById("cijenaPonude").value;
+    let idVezanePonude = document.getElementById("idVezanePonudeSelect").value;
+    let odbijenaPonuda = document.querySelector('input[name="odbijenaPonuda"]:checked')?.value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    if(cijenaPonude < 0){
+        odgovorNakonPost.innerHTML = `<h2>Ponuđena cijena ne može biti negativna! Ponovite unos.</h2>`;
+        odgovorNakonPost.style.display = 'block';
+        return;
+    }
+
+    if(idVezanePonude == ''){
+        idVezanePonude = null;
+    }
+
+    PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda === "true", function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>'
+            updatePonude();
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstPonude").value = '';
+        document.getElementById("cijenaPonude").value = '';
+        document.getElementById("datumPonude").value = '';
+        document.getElementById("idVezanePonudeSelect").value = '';
+        let odbijenaPonudaRadio = document.querySelectorAll('input[name="odbijenaPonuda"]');
+        odbijenaPonudaRadio.forEach(radio => radio.checked = false);
+    });
+}
+
+function updateZahtjevi(){
+    PoziviAjax.getZahtjeviForNekretnina(idNekretnine, function(err, data){
+        let odgovorNaZahtjev = document.getElementById("odgovorNaZahtjev");
+        let imaZahtjevaZaOdgovor = document.getElementById("imaZahtjevaZaOdgovor");
+
+        if(err){
+            if(err.status == 404){
+                imaZahtjevaZaOdgovor.innerHTML = `<h2>Nema novih zahtjeva na koje je moguće odgovoriti!</h2>`;
+            }
+            else{
+                imaZahtjevaZaOdgovor.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
+            }
+            imaZahtjevaZaOdgovor.style.display = 'block';
+            odgovorNaZahtjev.style.display = 'none';
+        }
+        else{
+            let idVezanogZahtjevaSelect = document.getElementById("idVezanogZahtjevaSelect");
+            idVezanogZahtjevaSelect.innerHTML = '';
+
+            data.forEach(z => {
+                const idZahtjevaOption = document.createElement("option");
+                idZahtjevaOption.value = z.id;
+                idZahtjevaOption.textContent = z.id;
+                idVezanogZahtjevaSelect.appendChild(idZahtjevaOption);
+            });
+
+            imaZahtjevaZaOdgovor.style.display = 'none';
+            odgovorNaZahtjev.style.display = 'block';
+        }
+    });
+}
+
+let putZahtjevButton = document.getElementById("putZahtjevButton");
+putZahtjevButton.onclick = function(){
+    let idVezanogZahtjeva = document.getElementById("idVezanogZahtjevaSelect").value;
+    let odobren = document.querySelector('input[name="odobrenZahtjev"]:checked')?.value === "true";
+    let addToTekst = document.getElementById("addToTekst").value;
+
+    if(addToTekst == ''){
+        addToTekst = null;
+    }
+
+    if(!odobren && addToTekst == null){
+        odgovorNakonPost.innerHTML = `<h2>Potrebno je dodati tekst ukoliko se odbija zahtjev.</h2>`;
+        odgovorNakonPost.style.display = 'block';
+        return;
+    }
+
+    PoziviAjax.putZahtjev(idNekretnine, idVezanogZahtjeva, odobren, addToTekst, function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno izmijenjen zahtjev!</h2>';
+            updateZahtjevi();
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("addToTekst").value = '';
+        let odobrenZahtjevRadio = document.querySelectorAll('input[name="odobrenZahtjev"]');
+        odobrenZahtjevRadio.forEach(radio => radio.checked = false);
     });
 }

@@ -203,7 +203,8 @@ app.get('/korisnik', async (req, res) => {
       ime: user.ime,
       prezime: user.prezime,
       username: user.username,
-      password: user.password // Should exclude the password for security reasons
+      password: user.password, // Should exclude the password for security reasons
+      admin: user.admin
     };
 
     res.status(200).json(userData);
@@ -649,7 +650,7 @@ app.post('/nekretnina/:id/zahtjev', async(req, res) => {
       korisnik_id: korisnik.id,
       tekst: zahtjev.tekst,
       trazeniDatum: new Date(zahtjev.trazeniDatum),
-      odobren: false
+      odobren: null
     };
 
     await baza.zahtjev.create(noviZahtjev);
@@ -693,7 +694,7 @@ app.put('/nekretnina/:id/zahtjev/:zid', async(req, res) => {
     zahtjev.tekst = zahtjev.tekst.concat(" ODGOVOR ADMINA: ", odgovor.addToTekst);
     await zahtjev.save();
 
-    return res.status(200).json({ poruka: 'Uspješno izmjenjen zahtjev' });
+    return res.status(200).json({ poruka: 'Uspješno izmijenjen zahtjev' });
   }
   catch(error) {
     console.error(error);
@@ -723,6 +724,92 @@ app.get('/korisnik/:id', async (req, res) => {
 
     res.status(200).json(userData);
   } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
+
+app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
+  const { id } = req.params;
+
+  try{
+    const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
+
+    let ponude = [];
+
+    if(korisnik.admin){
+      ponude = await baza.ponuda.findAll({
+        where: {
+          [Sequelize.Op.and]: [
+            {nekretnina_id: id},
+            {vezana_ponuda_id: null},
+            {odbijenaPonuda: false}
+          ]
+        }
+      });
+    }
+    else{
+      ponude = await baza.ponuda.findAll({
+        where: {
+          [Sequelize.Op.and]: [
+            {nekretnina_id: id},
+            {korisnik_id: korisnik.id},
+            {vezana_ponuda_id: null},
+            {odbijenaPonuda: false}
+          ]
+        }
+      });
+    }
+
+    if(!ponude || ponude.length == 0){
+      return res.status(404).json({ poruka: 'Korisnik nema ranijih ponuda za ovu nekretninu' });
+    }
+
+    let ponudePlusVezane = [...ponude];
+
+    for(let p of ponude){
+      let vezane = await baza.ponuda.findAll({
+        where: {
+          [Sequelize.Op.and]: [
+            {nekretnina_id: id},
+            {vezana_ponuda_id: p.id}
+          ]
+        }
+      });
+
+      ponudePlusVezane.push(...vezane);
+    }
+    
+    res.status(200).json(ponudePlusVezane);
+  }
+  catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
+app.get('/nekretnina/:id/zahtjevi', async(req, res) => {
+  const { id } = req.params;
+  
+  try{
+    let zahtjevi = await baza.zahtjev.findAll({
+      where: {
+        [Sequelize.Op.and]: [
+          {nekretnina_id: id},
+          {odobren: null}
+        ]
+      }
+    });
+
+    if(!zahtjevi || zahtjevi.length == 0){
+      return res.status(404).json({ poruka: 'Nema neodgovorenih zahtjeva za ovu nekretninu' });
+    }
+    else{
+      return res.status(200).json(zahtjevi);
+    }
+  }
+  catch (error) {
     console.error('Error fetching user data:', error);
     res.status(500).json({ greska: 'Internal Server Error' });
   }

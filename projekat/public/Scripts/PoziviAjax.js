@@ -48,87 +48,47 @@ const PoziviAjax = (() => {
 
     // ažurira podatke loginovanog korisnika
     function impl_putKorisnik(noviPodaci, fnCallback) {
-        // Check if user is authenticated
-        if (!req.session.username) {
-            // User is not logged in
-            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
+        var ajax = new XMLHttpRequest()
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                fnCallback(null, ajax.response)
+            }
+            else if (ajax.readyState == 4) {
+                //desio se neki error
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
+            }
         }
-
-        // Get data from request body
-        const { ime, prezime, username, password } = noviPodaci;
-
-        // Read user data from the JSON file
-        const users = readJsonFile('korisnici');
-
-        // Find the user by username
-        const loggedInUser = users.find((user) => user.username === req.session.username);
-
-        if (!loggedInUser) {
-            // User not found (should not happen if users are correctly managed)
-            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
-        }
-
-        // Update user data with the provided values
-        if (ime) loggedInUser.ime = ime;
-        if (prezime) loggedInUser.prezime = prezime;
-        //if (username) loggedInUser.adresa = adresa;
-        //if (password) loggedInUser.brojTelefona = brojTelefona;
-        if (username) loggedInUser.username = username;
-        if (password) loggedInUser.password = password;
-
-        // Save the updated user data back to the JSON file
-        saveJsonFile('korisnici', users);
-
-        fnCallback(null, { poruka: 'Podaci su uspješno ažurirani' });
+        ajax.open("PUT", "http://localhost:3000/korisnik", true)
+        ajax.setRequestHeader("Content-Type", "application/json")
+        forSend = JSON.stringify(noviPodaci)
+        ajax.send(forSend)
     }
 
     // dodaje novi upit za trenutno loginovanog korisnika
     function impl_postUpit(nekretnina_id, tekst_upita, fnCallback) {
-        // Check if user is authenticated
-        if (!req.session.username) {
-            // User is not logged in
-            return fnCallback({ status: 401, statusText: 'Neautorizovan pristup' }, null);
-        }
+        var ajax = new XMLHttpRequest()
 
-        // Read user data from the JSON file asynchronously
-        readJsonFileAsync('korisnici', (err, users) => {
-            if (err) {
-                return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                fnCallback(null, ajax.response)
             }
-
-            // Read properties data from the JSON file asynchronously
-            readJsonFileAsync('nekretnine', (err, nekretnine) => {
-                if (err) {
-                    return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                }
-
-                // Find the user by username
-                const loggedInUser = users.find((user) => user.username === req.session.username);
-
-                // Check if the property with nekretnina_id exists
-                const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
-
-                if (!nekretnina) {
-                    // Property not found
-                    return fnCallback({ status: 400, statusText: `Nekretnina sa id-em ${nekretnina_id} ne postoji` }, null);
-                }
-
-                // Add a new query to the property's queries array
-                nekretnina.upiti.push({
-                    korisnik_id: loggedInUser.id,
-                    tekst_upita: tekst_upita
-                });
-
-                // Save the updated properties data back to the JSON file asynchronously
-                saveJsonFileAsync('nekretnine', nekretnine, (err) => {
-                    if (err) {
-                        return fnCallback({ status: 500, statusText: 'Internal Server Error' }, null);
-                    }
-
-                    fnCallback(null, { poruka: 'Upit je uspješno dodan' });
-                });
-            });
-        });
+            else if (ajax.readyState == 4 && ajax.status == 429) {
+                fnCallback({ status: 429, statusText: "Već ste postavili maksimum od 3 upita za ovu nekretninu!" }, null);
+            }
+            else if (ajax.readyState == 4) {
+                //desio se neki error
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
+            }
+        }
+        ajax.open("POST", "http://localhost:3000/upit", true)
+        ajax.setRequestHeader("Content-Type", "application/json")
+        var objekat = {
+            "nekretnina_id": nekretnina_id,
+            "tekst_upita": tekst_upita
+        }
+        forSend = JSON.stringify(objekat)
+        ajax.send(forSend)
     }
 
     function impl_getNekretnine(fnCallback) {
@@ -289,6 +249,89 @@ const PoziviAjax = (() => {
         ajax.send();
     }
 
+
+    function impl_postZahtjev(nekretnina_id, tekst_zahtjeva, trazeni_datum, fnCallback) {
+        var ajax = new XMLHttpRequest()
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                fnCallback(null, ajax.response)
+            }
+            else if (ajax.readyState == 4 && ajax.status == 404) {
+                fnCallback({ status: 404, statusText: JSON.parse(ajax.response).greska }, null);
+            }
+            else if (ajax.readyState == 4) {
+                //desio se neki error
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
+            }
+        }
+
+        let idParam = encodeURIComponent(nekretnina_id);
+        ajax.open("POST", "http://localhost:3000/nekretnina/" + idParam + "/zahtjev", true)
+        ajax.setRequestHeader("Content-Type", "application/json")
+        var objekat = {
+            "tekst": tekst_zahtjeva,
+            "trazeniDatum": trazeni_datum
+        }
+        forSend = JSON.stringify(objekat)
+        ajax.send(forSend)
+    }
+
+    function impl_postPonuda(nekretnina_id, tekst_ponude, cijena_ponude, datum_ponude, id_vezane_ponude, odbijena, fnCallback){
+        var ajax = new XMLHttpRequest()
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                fnCallback(null, ajax.response)
+            }
+            else if (ajax.readyState == 4 && ajax.status == 400) {
+                fnCallback({ status: 404, statusText: JSON.parse(ajax.response).greska }, null);
+            }
+            else if (ajax.readyState == 4) {
+                //desio se neki error
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
+            }
+        }
+
+        let idParam = encodeURIComponent(nekretnina_id);
+        ajax.open("POST", "http://localhost:3000/nekretnina/" + idParam + "/ponuda", true)
+        ajax.setRequestHeader("Content-Type", "application/json")
+        var objekat = {
+            "tekst": tekst_ponude,
+            "ponudaCijene": cijena_ponude,
+            "datumPonude": datum_ponude,
+            "odbijenaPonuda": odbijena,
+            "idVezanePonude": id_vezane_ponude
+        }
+        forSend = JSON.stringify(objekat)
+        ajax.send(forSend)
+    }
+
+    function impl_putZahtjev(nekretnina_id, zahtjev_id, odobren, addToTekst, fnCallback){
+        var ajax = new XMLHttpRequest()
+
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                fnCallback(null, ajax.response)
+            }
+            else if (ajax.readyState == 4) {
+                //desio se neki error
+                fnCallback({ status: ajax.status, statusText: ajax.statusText }, null);
+            }
+        }
+
+        let idParam = encodeURIComponent(nekretnina_id);
+        let zidParam = encodeURIComponent(zahtjev_id);
+        ajax.open("PUT", "http://localhost:3000/nekretnina/" + idParam + "/zahtjev/" + zidParam, true)
+        ajax.setRequestHeader("Content-Type", "application/json")
+        var objekat = {
+            "odobren": odobren,
+            "addToTekst": addToTekst
+        }
+        forSend = JSON.stringify(objekat)
+        ajax.send(forSend)
+    }
+
     //dodano za potrebe detalji.js
 
     function getKorisnikById(korisnik_id, fnCallback) {
@@ -301,6 +344,41 @@ const PoziviAjax = (() => {
                 try {
                     const korisnik = JSON.parse(data);
                     fnCallback(null, korisnik);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
+
+    function getPonudeForKorisnik(nekretnina_id, fnCallback){
+        let idParam = encodeURIComponent(nekretnina_id);
+
+        ajaxRequest('GET', '/nekretnina/' + idParam + '/ponude/korisnik', null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const ponude = JSON.parse(data);
+                    fnCallback(null, ponude);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
+    function getZahtjeviForNekretnina(nekretnina_id, fnCallback){
+        let idParam = encodeURIComponent(nekretnina_id);
+
+        ajaxRequest('GET', '/nekretnina/' + idParam + '/zahtjevi', null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const ponude = JSON.parse(data);
+                    fnCallback(null, ponude);
                 } catch (parseError) {
                     fnCallback(parseError, null);
                 }
@@ -321,6 +399,11 @@ const PoziviAjax = (() => {
         getMojiUpiti: getMojiUpiti,
         getNekretnina: getNekretnina,
         getNextUpiti: getNextUpiti,
-        getKorisnikById: getKorisnikById
+        getKorisnikById: getKorisnikById,
+        postZahtjev: impl_postZahtjev,
+        postPonuda: impl_postPonuda,
+        getPonudeForKorisnik: getPonudeForKorisnik,
+        putZahtjev: impl_putZahtjev,
+        getZahtjeviForNekretnina: getZahtjeviForNekretnina
     };
 })();
