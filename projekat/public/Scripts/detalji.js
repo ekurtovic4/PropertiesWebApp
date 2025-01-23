@@ -231,6 +231,7 @@ function getInteresovanja() {
             }
             if(first){
                 setInteresovanja();
+                first = false;
             }
         }
     });
