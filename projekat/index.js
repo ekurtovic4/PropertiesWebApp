@@ -584,40 +584,31 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
       }
 
       if(ponudaZaKojuJeVezana.vezana_ponuda_id == null){
-        novaPonuda.vezana_ponuda_id = ponudaZaKojuJeVezana.id;
-
         if(!korisnik.admin && ponudaZaKojuJeVezana.korisnik_id != korisnik.id){
           return res.status(401).json({ greska: 'Neautorizovan pristup' });
         }
 
+        novaPonuda.vezana_ponuda_id = ponudaZaKojuJeVezana.id;
+
         if(ponuda.odbijenaPonuda){
-          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: ponudaZaKojuJeVezana.id} });
-
-          for(let vp of vezanePonude){
-            vp.odbijenaPonuda = true;
-            await vp.save();
-          }
-
           ponudaZaKojuJeVezana.odbijenaPonuda = true;
           await ponudaZaKojuJeVezana.save();
         }
       }
       else{
         let korijenskaPonuda = await baza.ponuda.findOne({ where: {id: ponudaZaKojuJeVezana.vezana_ponuda_id} });
-        novaPonuda.vezana_ponuda_id = korijenskaPonuda.id;
+
+        if(korijenskaPonuda.odbijenaPonuda){
+          return res.status(400).json({ greska: 'Ne mogu se vezati nove ponude u lanac odbijenih ponuda!' });
+        }
 
         if(!korisnik.admin && korijenskaPonuda.korisnik_id != korisnik.id){
           return res.status(401).json({ greska: 'Neautorizovan pristup' });
         }
 
+        novaPonuda.vezana_ponuda_id = korijenskaPonuda.id;
+
         if(ponuda.odbijenaPonuda){
-          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: korijenskaPonuda.id} });
-
-          for(let vp of vezanePonude){
-            vp.odbijenaPonuda = true;
-            await vp.save();
-          }
-
           korijenskaPonuda.odbijenaPonuda = true;
           await korijenskaPonuda.save();
         }
