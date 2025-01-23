@@ -7,17 +7,49 @@ function postaviCarousel(glavniElement, sviElementi, indeks = 0){
 
     const fnLijevo = function(){
         indeks = (indeks - 1 + brojElemenata) % brojElemenata;
-        let htmlContent = "<div class=\"upit\">";
-        htmlContent += sviElementi[indeks].innerHTML;
-        htmlContent += "</div>";
+        let htmlContent = '';
+        let interesovanje = sviElementi[indeks];
+
+        if(interesovanje.classList.contains('upit')){
+            htmlContent += "<div class=\"upit\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else if(interesovanje.classList.contains('ponuda')){
+            htmlContent += "<div class=\"ponuda\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else{
+            htmlContent += "<div class=\"zahtjev\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+
         glavniElement.innerHTML = htmlContent;
     }
 
     const fnDesno = function(){
         indeks = (indeks + 1) % brojElemenata;
-        let htmlContent = "<div class=\"upit\">";
-        htmlContent += sviElementi[indeks].innerHTML;
-        htmlContent += "</div>";
+        let htmlContent = '';
+        let interesovanje = sviElementi[indeks];
+
+        if(interesovanje.classList.contains('upit')){
+            htmlContent += "<div class=\"upit\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else if(interesovanje.classList.contains('ponuda')){
+            htmlContent += "<div class=\"ponuda\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else{
+            htmlContent += "<div class=\"zahtjev\">";
+            htmlContent += interesovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+
         glavniElement.innerHTML = htmlContent;
     }
 

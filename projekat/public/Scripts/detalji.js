@@ -2,8 +2,8 @@ let indeks = 0;
 let sviElementi = [];
 let idNekretnine = 0; 
 let page = 0;
-let dosloDoKraja = false;
 let loggedInUserIsAdmin = false;
+let first = true;
 
 window.onload = async function() {
     let params = new URLSearchParams(window.location.search);
@@ -80,30 +80,7 @@ window.onload = async function() {
         opisP.innerHTML = `<strong>Opis:</strong> ${nekretnina.opis}`;
         opisDiv.appendChild(opisP);
 
-        for(let upit of nekretnina.upiti) {
-            try{
-                let korisnik = await new Promise((resolve, reject) => {
-                    PoziviAjax.getKorisnikById(upit.korisnik_id, (error, data) => {
-                        if(data) resolve(data);
-                        else reject(error);
-                    });
-                });
-        
-                let username = korisnik.username;
-                let upitDiv = document.createElement('div');
-                upitDiv.classList.add('upit');
-                upitDiv.innerHTML = `
-                    <p><strong>${username}:</strong></p>
-                    <p>${upit.tekst}</p>
-                `;
-                sviElementi.push(upitDiv);
-
-                setUpiti();
-            }
-            catch(error) {
-                console.error("Greška prilikom učitavanja korisnika za upit");
-            }
-        }
+        getInteresovanja();
 
         let dodavanjeInteresovanja = document.getElementById("dodavanjeInteresovanja");
 
@@ -146,63 +123,117 @@ async function carousel(direction){
         indeks = (indeks - 1 + brojElemenata) % brojElemenata;
     }
     else if(direction == "right"){
-        if(!dosloDoKraja && indeks + 1 == sviElementi.length){
-            page += 1;
-            await getNextUpiti();
-            brojElemenata = sviElementi.length;
-            carouselFunkcija = postaviCarousel(glavniElement, sviElementi, indeks);
-        }
-
         carouselFunkcija.fnDesno();
         indeks = (indeks + 1) % brojElemenata;
     }
 }
 
-function setUpiti(){
-    let htmlContent = "";
-    htmlContent += "<div class=\"upit\">";
-    htmlContent += sviElementi[indeks].innerHTML;
-    htmlContent += "</div>";
-
+function setInteresovanja(){
     let glavniElement = document.getElementById("upiti");
+    let prvoInteresovanje = sviElementi[0];
+    let htmlContent = '';
+
+    if(prvoInteresovanje.classList.contains('upit')){
+        htmlContent += "<div class=\"upit\">";
+        htmlContent += prvoInteresovanje.innerHTML;
+        htmlContent += "</div>";
+    }
+    else if(prvoInteresovanje.classList.contains('ponuda')){
+        htmlContent += "<div class=\"ponuda\">";
+        htmlContent += prvoInteresovanje.innerHTML;
+        htmlContent += "</div>";
+    }
+    else{
+        htmlContent += "<div class=\"zahtjev\">";
+        htmlContent += prvoInteresovanje.innerHTML;
+        htmlContent += "</div>";
+    }
+
     glavniElement.innerHTML = htmlContent;
 }
 
-async function getNextUpiti() {
-    try{
-        let upiti = await new Promise((resolve, reject) => {
-            PoziviAjax.getNextUpiti(idNekretnine, page, (error, data) => {
-                if(data) resolve(data);
-                else reject(error);
-            });
-        });
+function getInteresovanja() {
+    PoziviAjax.getInteresovanja(idNekretnine, (error, data) => {
+        if(error){
+            console.log(error);
+        }
+        else{
+            for(let i = sviElementi.length; i < data.length; i++){
+                let el = data[i];
 
-        for(let upit of upiti) {
-            try{
-                let korisnik = await new Promise((resolve, reject) => {
-                    PoziviAjax.getKorisnikById(upit.korisnik_id, (error, data) => {
-                        if(data) resolve(data);
-                        else reject(error);
-                    });
-                });
-        
-                let username = korisnik.username;
                 let upitDiv = document.createElement('div');
-                upitDiv.classList.add('upit');
-                upitDiv.innerHTML = `
-                    <p><strong>${username}:</strong></p>
-                    <p>${upit.tekst}</p>
-                `;
+                let htmlContent = '';
+
+                if('odbijenaPonuda' in el){
+                    upitDiv.classList.add('ponuda');
+                    upitDiv.id = "P" + toString(el.id);
+
+                    htmlContent += `
+                        <p><strong>Id ponude: ${el.id}</strong></p>
+                        <p>${el.tekst}</p>
+                    `;
+
+                    if(el.odbijenaPonuda){
+                        htmlContent += `
+                            <p><strong>Status:</strong> odbijena</p>
+                        `;
+                    }
+                    else{
+                        htmlContent += `
+                            <p><strong>Status:</strong> odobrena</p>
+                        `;
+                    }
+                }
+                else if('trazeniDatum' in el){
+                    upitDiv.classList.add('zahtjev');
+                    upitDiv.id = "Z" + toString(el.id);
+
+                    htmlContent += `
+                        <p><strong>Id zahtjeva: ${el.id}</strong></p>
+                        <p>${el.tekst}</p>
+                    `;
+
+                    let trazeni_datum = new Date(el.trazeniDatum);
+                    let formatiranDatum = `${trazeni_datum.getDate().toString().padStart(2, '0')}.${(trazeni_datum.getMonth() + 1)
+                        .toString().padStart(2, '0')}.${trazeni_datum.getFullYear()}.`
+
+                    htmlContent += `
+                        <p><strong>Datum:</strong> ${formatiranDatum}</p>
+                    `;
+                    if(el.odobren == null){
+                        htmlContent += `
+                            <p><strong>Status:</strong> neodgovoren</p>
+                        `;
+                    }
+                    else if(el.odobren){
+                        htmlContent += `
+                            <p><strong>Status:</strong> odobren</p>
+                        `;
+                    }
+                    else{
+                        htmlContent += `
+                            <p><strong>Status:</strong> odbijen</p>
+                        `;
+                    }
+                }
+                else{
+                    upitDiv.classList.add('upit');
+                    upitDiv.id = "U" + toString(el.id);
+
+                    htmlContent += `
+                        <p><strong>Id upita: ${el.id}</strong></p>
+                        <p>${el.tekst}</p>
+                    `;
+                }
+
+                upitDiv.innerHTML = htmlContent;
                 sviElementi.push(upitDiv);
             }
-            catch(error) {
-                console.error("Error fetching username for korisnik_id");
+            if(first){
+                setInteresovanja();
             }
         }
-    }
-    catch(error) {
-        dosloDoKraja = true;
-    }
+    });
 }
 
 function getTop5Nekretnina(){
@@ -340,10 +371,11 @@ postUpitButton.onclick = function(){
 
     PoziviAjax.postUpit(idNekretnine, tekstUpita, function(err, data){
         if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`  
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;  
         }
         else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>'
+            odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>';
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -365,10 +397,11 @@ postZahtjevButton.onclick = function(){
 
     PoziviAjax.postZahtjev(idNekretnine, tekstZahtjeva, datumZahtjeva, function(err, data){
         if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>` 
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`; 
         }
         else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>'
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>';
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -397,17 +430,17 @@ postPonudaButton.onclick = function(){
 
     PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda === "true", function(err, data){
         if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
         }
         else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>'
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>';
             updatePonude();
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
         document.getElementById("tekstPonude").value = '';
         document.getElementById("cijenaPonude").value = '';
-        document.getElementById("datumPonude").value = '';
         document.getElementById("idVezanePonudeSelect").value = '';
         let odbijenaPonudaRadio = document.querySelectorAll('input[name="odbijenaPonuda"]');
         odbijenaPonudaRadio.forEach(radio => radio.checked = false);
@@ -469,6 +502,7 @@ putZahtjevButton.onclick = function(){
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno izmijenjen zahtjev!</h2>';
             updateZahtjevi();
+            updateZahtjevInSviElementi(idVezanogZahtjeva);
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -476,4 +510,43 @@ putZahtjevButton.onclick = function(){
         let odobrenZahtjevRadio = document.querySelectorAll('input[name="odobrenZahtjev"]');
         odobrenZahtjevRadio.forEach(radio => radio.checked = false);
     });
+}
+
+function updateZahtjevInSviElementi(idVezanogZahtjeva){
+    PoziviAjax.getZahtjevById(idVezanogZahtjeva, function(err, el){
+        if(err){
+            console.log(err);
+        }
+        else{
+            let zahtjev = sviElementi.find(el => el.id == "Z" + toString(idVezanogZahtjeva));
+
+            let htmlContent = '';
+            htmlContent += `
+                <p><strong>Id zahtjeva: ${el.id}</strong></p>
+                <p>${el.tekst}</p>
+            `;
+
+            let trazeni_datum = new Date(el.trazeniDatum);
+            let formatiranDatum = `${trazeni_datum.getDate().toString().padStart(2, '0')}.${(trazeni_datum.getMonth() + 1)
+                .toString().padStart(2, '0')}.${trazeni_datum.getFullYear()}.`
+
+            htmlContent += `
+                <p><strong>Datum:</strong> ${formatiranDatum}</p>
+            `;
+            if(el.odobren == "true"){
+                htmlContent += `
+                    <p><strong>Status:</strong> odobren</p>
+                `;
+            }
+            else{
+                htmlContent += `
+                    <p><strong>Status:</strong> odbijen</p>
+                `;
+            }
+
+            zahtjev.innerHTML = htmlContent;
+        }
+    });
+
+    
 }

@@ -815,6 +815,19 @@ app.get('/nekretnina/:id/zahtjevi', async(req, res) => {
   }
 });
 
+app.get('/zahtjev/:zid', async(req, res) => {
+  const { zid } = req.params;
+
+  try{
+    let zahtjev = await baza.zahtjev.findOne({ where: {id: zid} });
+    res.status(200).json(zahtjev);
+  }
+  catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ greska: 'Internal Server Error' });
+  }
+});
+
 //============================
 
 // Start server

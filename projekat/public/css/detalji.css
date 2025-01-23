@@ -167,3 +167,17 @@ iframe {
 #dodavanjeInteresovanja h3 {
   margin-left: 0;
 }
+
+.ponuda {
+  border: 1px solid #000;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: rgb(193, 208, 212);
+}
+
+.zahtjev {
+  border: 1px solid #000;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: rgb(233, 188, 200);
+}

@@ -332,6 +332,23 @@ const PoziviAjax = (() => {
         ajax.send(forSend)
     }
 
+    function impl_getInteresovanja(nekretnina_id, fnCallback) {
+        let idParam = encodeURIComponent(nekretnina_id);
+
+        ajaxRequest('GET', '/nekretnina/' + idParam + '/interesovanja', null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const interesovanja = JSON.parse(data);
+                    fnCallback(null, interesovanja);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
     //dodano za potrebe detalji.js
 
     function getKorisnikById(korisnik_id, fnCallback) {
@@ -386,6 +403,23 @@ const PoziviAjax = (() => {
         });
     }
 
+    function getZahtjevById(zahtjev_id, fnCallback){
+        let zidParam = encodeURIComponent(zahtjev_id);
+
+        ajaxRequest('GET', '/zahtjev/' + zidParam, null, (error, data) => {
+            if (error) {
+                fnCallback(error, null);
+            } else {
+                try {
+                    const zahtjev = JSON.parse(data);
+                    fnCallback(null, zahtjev);
+                } catch (parseError) {
+                    fnCallback(parseError, null);
+                }
+            }
+        });
+    }
+
     //============================
 
     return {
@@ -404,6 +438,8 @@ const PoziviAjax = (() => {
         postPonuda: impl_postPonuda,
         getPonudeForKorisnik: getPonudeForKorisnik,
         putZahtjev: impl_putZahtjev,
-        getZahtjeviForNekretnina: getZahtjeviForNekretnina
+        getZahtjeviForNekretnina: getZahtjeviForNekretnina,
+        getInteresovanja: impl_getInteresovanja,
+        getZahtjevById: getZahtjevById
     };
 })();
