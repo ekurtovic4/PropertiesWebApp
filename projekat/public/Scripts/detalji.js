@@ -1,7 +1,7 @@
 let indeks = 0;
 let sviElementi = [];
 let idNekretnine = 0; 
-let loggedInUserIsAdmin = false;
+let korisnik = null;
 let first = true;
 let interesovanja = [];
 
@@ -104,7 +104,7 @@ window.onload = async function() {
                 odgovorNakonPost.style.display = 'none';
                 imaZahtjevaZaOdgovor.style.display = 'none';
 
-                loggedInUserIsAdmin = data.admin;
+                korisnik = data;
             }
         });
     }
@@ -173,18 +173,28 @@ function getInteresovanja() {
                         <p>${el.tekst}</p>
                     `;
 
-                    if(el.odbijenaPonuda){
+                    if(!el.odbijenaPonuda){
                         htmlContent += `
-                            <p><strong>Status:</strong> odbijena</p>
+                            <p><strong>Status:</strong> odobrena</p>
                         `;
                     }
                     else{
                         htmlContent += `
-                            <p><strong>Status:</strong> nije odbijena</p>
+                            <p><strong>Status:</strong> odbijena</p>
+                        `;
+                    }
+
+                    if('cijenaPonude' in el){
+                        htmlContent += `
+                            <p><strong>Cijena:</strong> ${el.cijenaPonude}</p>
                         `;
                     }
                 }
                 else if('trazeniDatum' in el){
+                    if(!korisnik || (!korisnik.admin && el.korisnik_id != korisnik.id)){
+                        continue;
+                    }
+
                     upitDiv.classList.add('zahtjev');
                     upitDiv.id = "Z" + toString(el.id);
 
@@ -323,7 +333,7 @@ function prikaziPoljaZaUnos(){
         unosUpita.style.display = 'block';
     }
     else if(tip == "zahtjev"){
-        if(loggedInUserIsAdmin){
+        if(korisnik && korisnik.admin){
             updateZahtjevi();
         }
         else{
@@ -333,6 +343,24 @@ function prikaziPoljaZaUnos(){
     else{
         updatePonude();
         unosPonude.style.display = 'block';
+        document.querySelectorAll('input[name="odbijenaPonuda"]').forEach((radio) => {
+            radio.disabled = true;
+        });
+    }
+}
+
+function provjeriJeLiPocetna(){
+    let idVezanePonude = document.getElementById("idVezanePonudeSelect").value;
+
+    if(idVezanePonude == ''){
+        document.querySelectorAll('input[name="odbijenaPonuda"]').forEach((radio) => {
+            radio.disabled = true;
+        });
+    }
+    else{
+        document.querySelectorAll('input[name="odbijenaPonuda"]').forEach((radio) => {
+            radio.disabled = false;
+        });
     }
 }
 
@@ -346,14 +374,20 @@ function updatePonude(){
                 });
             }
             else{
+                console.log(err);
                 let odgovorNakonPost = document.getElementById("odgovorNakonPost");
                 odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
-                odgovorNakonPost.display.style = 'block';
+                odgovorNakonPost.style.display = 'block';
             }
         }
         else{
             let idVezanePonudeSelect = document.getElementById("idVezanePonudeSelect");
             idVezanePonudeSelect.innerHTML = '';
+
+            const pocetnaPonudaOption = document.createElement("option");
+            pocetnaPonudaOption.value = '';
+            pocetnaPonudaOption.textContent = 'početna';
+            idVezanePonudeSelect.appendChild(pocetnaPonudaOption);
 
             data.forEach(p => {
                 const idPonudeOption = document.createElement("option");
@@ -363,7 +397,6 @@ function updatePonude(){
             });
 
             idVezanePonudeSelect.disabled = false;
-            document.getElementById("odbijanjePonudeRadio").style.display = 'block';
         }
     });
 }
@@ -411,7 +444,6 @@ postUpitButton.onclick = function(){
         }
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>';
-            //getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -437,7 +469,6 @@ postZahtjevButton.onclick = function(){
         }
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>';
-            //getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -464,7 +495,11 @@ postPonudaButton.onclick = function(){
         idVezanePonude = null;
     }
 
-    PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda === "true", function(err, data){
+    if(odbijenaPonuda != null){
+        odbijenaPonuda = (odbijenaPonuda === "true");
+    }
+
+    PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda, function(err, data){
         if(err){
             odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
         }
@@ -488,6 +523,7 @@ putZahtjevButton.onclick = function(){
     let idVezanogZahtjeva = document.getElementById("idVezanogZahtjevaSelect").value;
     let odobren = document.querySelector('input[name="odobrenZahtjev"]:checked')?.value === "true";
     let addToTekst = document.getElementById("addToTekst").value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
 
     if(!odobren && addToTekst == ''){
         odgovorNakonPost.innerHTML = `<h2>Potrebno je dodati tekst ukoliko se odbija zahtjev.</h2>`;

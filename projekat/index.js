@@ -585,7 +585,7 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
       }
 
       if(ponudaZaKojuJeVezana.vezana_ponuda_id == null){
-        if(!korisnik.admin && ponudaZaKojuJeVezana.korisnik_id != korisnik.id){
+        if(!korisnik.admin){
           return res.status(401).json({ greska: 'Neautorizovan pristup' });
         }
 
@@ -753,6 +753,7 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
     const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
 
     let ponude = [];
+    let ponudePlusVezane = [];
 
     if(korisnik.admin){
       ponude = await baza.ponuda.findAll({
@@ -760,10 +761,17 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
           [Sequelize.Op.and]: [
             {nekretnina_id: id},
             {vezana_ponuda_id: null},
-            {odbijenaPonuda: false}
+            {
+              [Sequelize.Op.or]: [
+                {odbijenaPonuda: false},
+                {odbijenaPonuda: null}
+              ]
+            }
           ]
         }
       });
+
+      ponudePlusVezane = [...ponude];
     }
     else{
       ponude = await baza.ponuda.findAll({
@@ -772,7 +780,12 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
             {nekretnina_id: id},
             {korisnik_id: korisnik.id},
             {vezana_ponuda_id: null},
-            {odbijenaPonuda: false}
+            {
+              [Sequelize.Op.or]: [
+                {odbijenaPonuda: false},
+                {odbijenaPonuda: null}
+              ]
+            }
           ]
         }
       });
@@ -781,8 +794,6 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
     if(!ponude || ponude.length == 0){
       return res.status(404).json({ poruka: 'Korisnik nema ranijih ponuda za ovu nekretninu' });
     }
-
-    let ponudePlusVezane = [...ponude];
 
     for(let p of ponude){
       let vezane = await baza.ponuda.findAll({
@@ -795,6 +806,10 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
       });
 
       ponudePlusVezane.push(...vezane);
+    }
+
+    if(ponudePlusVezane.length == 0){
+      return res.status(404).json({ poruka: 'Korisnik nema ranijih ponuda za ovu nekretninu' });
     }
     
     res.status(200).json(ponudePlusVezane);
