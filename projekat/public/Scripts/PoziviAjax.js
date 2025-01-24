@@ -403,23 +403,6 @@ const PoziviAjax = (() => {
         });
     }
 
-    function getZahtjevById(zahtjev_id, fnCallback){
-        let zidParam = encodeURIComponent(zahtjev_id);
-
-        ajaxRequest('GET', '/zahtjev/' + zidParam, null, (error, data) => {
-            if (error) {
-                fnCallback(error, null);
-            } else {
-                try {
-                    const zahtjev = JSON.parse(data);
-                    fnCallback(null, zahtjev);
-                } catch (parseError) {
-                    fnCallback(parseError, null);
-                }
-            }
-        });
-    }
-
     //============================
 
     return {
@@ -439,7 +422,6 @@ const PoziviAjax = (() => {
         getPonudeForKorisnik: getPonudeForKorisnik,
         putZahtjev: impl_putZahtjev,
         getZahtjeviForNekretnina: getZahtjeviForNekretnina,
-        getInteresovanja: impl_getInteresovanja,
-        getZahtjevById: getZahtjevById
+        getInteresovanja: impl_getInteresovanja
     };
 })();

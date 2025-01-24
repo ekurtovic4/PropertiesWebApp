@@ -9,32 +9,17 @@ module.exports = function (sequelize, DataTypes) {
         cijenaPonude: Sequelize.INTEGER,
         datumPonude: Sequelize.DATE,
         odbijenaPonuda: Sequelize.BOOLEAN,
-        vezana_ponuda_id: Sequelize.INTEGER,
-        /*vezanePonude: {
-            type: Sequelize.VIRTUAL,
-            get() {
-                return this.getVezanePonude();
-            }
-        }*/
+        vezana_ponuda_id: Sequelize.INTEGER
     },
     {
         tableName: 'Ponuda'
     });
 
-    /*Ponuda.prototype.getVezanePonude = async function() {
-        const ponude = await Ponuda.findAll({ 
-            where: {
-                [Sequelize.Op.and]: [
-                    {vezana_ponuda_id: this.vezana_ponuda_id}, 
-                    {id: {[Sequelize.Op.ne]: this.id}}
-                ]
-            } 
-        });
-        return ponude;
-    };*/
-
     Object.defineProperty(Ponuda.prototype, 'vezanePonude', {
         get: async function () {
+            if(this.vezana_ponuda_id == null){
+                return [];
+            }
             return await Ponuda.findAll({
                 where: {
                     [Sequelize.Op.and]: [

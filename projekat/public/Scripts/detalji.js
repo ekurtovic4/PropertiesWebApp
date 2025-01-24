@@ -1,9 +1,9 @@
 let indeks = 0;
 let sviElementi = [];
 let idNekretnine = 0; 
-let page = 0;
 let loggedInUserIsAdmin = false;
 let first = true;
+let interesovanja = [];
 
 window.onload = async function() {
     let params = new URLSearchParams(window.location.search);
@@ -158,9 +158,9 @@ function getInteresovanja() {
             console.log(error);
         }
         else{
-            for(let i = sviElementi.length; i < data.length; i++){
-                let el = data[i];
+            interesovanja = data;
 
+            for(el of data){
                 let upitDiv = document.createElement('div');
                 let htmlContent = '';
 
@@ -180,7 +180,7 @@ function getInteresovanja() {
                     }
                     else{
                         htmlContent += `
-                            <p><strong>Status:</strong> odobrena</p>
+                            <p><strong>Status:</strong> nije odbijena</p>
                         `;
                     }
                 }
@@ -341,6 +341,9 @@ function updatePonude(){
         if(err){
             if(err.status == 404){
                 document.getElementById("idVezanePonudeSelect").disabled = true;
+                document.querySelectorAll('input[name="odbijenaPonuda"]').forEach((radio) => {
+                    radio.disabled = true;
+                });
             }
             else{
                 let odgovorNakonPost = document.getElementById("odgovorNakonPost");
@@ -360,91 +363,8 @@ function updatePonude(){
             });
 
             idVezanePonudeSelect.disabled = false;
+            document.getElementById("odbijanjePonudeRadio").style.display = 'block';
         }
-    });
-}
-
-
-let postUpitButton = document.getElementById("postUpitButton");
-postUpitButton.onclick = function(){
-    let tekstUpita = document.getElementById("tekstUpita").value;
-    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
-
-    PoziviAjax.postUpit(idNekretnine, tekstUpita, function(err, data){
-        if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;  
-        }
-        else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>';
-            getInteresovanja();
-        }
-
-        odgovorNakonPost.style.display = 'block';
-        document.getElementById("tekstUpita").value = '';
-    });
-}
-
-let postZahtjevButton = document.getElementById("postZahtjevButton");
-postZahtjevButton.onclick = function(){
-    let tekstZahtjeva = document.getElementById("tekstZahtjeva").value;
-    let datumZahtjeva = document.getElementById("datumZahtjeva").value;
-    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
-
-    if(new Date(datumZahtjeva) < Date.now()){
-        odgovorNakonPost.innerHTML = `<h2>Datum ne može biti raniji od današnjeg! Odaberite drugi datum.</h2>`;
-        odgovorNakonPost.style.display = 'block';
-        return;
-    }
-
-    PoziviAjax.postZahtjev(idNekretnine, tekstZahtjeva, datumZahtjeva, function(err, data){
-        if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`; 
-        }
-        else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>';
-            getInteresovanja();
-        }
-
-        odgovorNakonPost.style.display = 'block';
-        document.getElementById("tekstZahtjeva").value = '';
-        document.getElementById("datumZahtjeva").value = '';
-    })
-}
-
-let postPonudaButton = document.getElementById("postPonudaButton");
-postPonudaButton.onclick = function(){
-    let tekstPonude = document.getElementById("tekstPonude").value;
-    let cijenaPonude = document.getElementById("cijenaPonude").value;
-    let idVezanePonude = document.getElementById("idVezanePonudeSelect").value;
-    let odbijenaPonuda = document.querySelector('input[name="odbijenaPonuda"]:checked')?.value;
-    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
-
-    if(cijenaPonude < 0){
-        odgovorNakonPost.innerHTML = `<h2>Ponuđena cijena ne može biti negativna! Ponovite unos.</h2>`;
-        odgovorNakonPost.style.display = 'block';
-        return;
-    }
-
-    if(idVezanePonude == ''){
-        idVezanePonude = null;
-    }
-
-    PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda === "true", function(err, data){
-        if(err){
-            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
-        }
-        else{
-            odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>';
-            updatePonude();
-            getInteresovanja();
-        }
-
-        odgovorNakonPost.style.display = 'block';
-        document.getElementById("tekstPonude").value = '';
-        document.getElementById("cijenaPonude").value = '';
-        document.getElementById("idVezanePonudeSelect").value = '';
-        let odbijenaPonudaRadio = document.querySelectorAll('input[name="odbijenaPonuda"]');
-        odbijenaPonudaRadio.forEach(radio => radio.checked = false);
     });
 }
 
@@ -480,17 +400,96 @@ function updateZahtjevi(){
     });
 }
 
+let postUpitButton = document.getElementById("postUpitButton");
+postUpitButton.onclick = function(){
+    let tekstUpita = document.getElementById("tekstUpita").value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    PoziviAjax.postUpit(idNekretnine, tekstUpita, function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;  
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>';
+            //getInteresovanja();
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstUpita").value = '';
+    });
+}
+
+let postZahtjevButton = document.getElementById("postZahtjevButton");
+postZahtjevButton.onclick = function(){
+    let tekstZahtjeva = document.getElementById("tekstZahtjeva").value;
+    let datumZahtjeva = document.getElementById("datumZahtjeva").value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    if(new Date(datumZahtjeva) < Date.now()){
+        odgovorNakonPost.innerHTML = `<h2>Datum ne može biti raniji od današnjeg! Odaberite drugi datum.</h2>`;
+        odgovorNakonPost.style.display = 'block';
+        return;
+    }
+
+    PoziviAjax.postZahtjev(idNekretnine, tekstZahtjeva, datumZahtjeva, function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`; 
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>';
+            //getInteresovanja();
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstZahtjeva").value = '';
+        document.getElementById("datumZahtjeva").value = '';
+    })
+}
+
+let postPonudaButton = document.getElementById("postPonudaButton");
+postPonudaButton.onclick = function(){
+    let tekstPonude = document.getElementById("tekstPonude").value;
+    let cijenaPonude = document.getElementById("cijenaPonude").value;
+    let idVezanePonude = document.getElementById("idVezanePonudeSelect").value;
+    let odbijenaPonuda = document.querySelector('input[name="odbijenaPonuda"]:checked')?.value;
+    let odgovorNakonPost = document.getElementById("odgovorNakonPost");
+
+    if(cijenaPonude < 0){
+        odgovorNakonPost.innerHTML = `<h2>Ponuđena cijena ne može biti negativna! Ponovite unos.</h2>`;
+        odgovorNakonPost.style.display = 'block';
+        return;
+    }
+
+    if(idVezanePonude == ''){
+        idVezanePonude = null;
+    }
+
+    PoziviAjax.postPonuda(idNekretnine, tekstPonude, cijenaPonude, Date.now(), idVezanePonude, odbijenaPonuda === "true", function(err, data){
+        if(err){
+            odgovorNakonPost.innerHTML = `<h2>Greška: ${err.statusText}</h2>`;
+        }
+        else{
+            odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>';
+            updatePonude();
+            //getInteresovanja();
+        }
+
+        odgovorNakonPost.style.display = 'block';
+        document.getElementById("tekstPonude").value = '';
+        document.getElementById("cijenaPonude").value = '';
+        document.getElementById("idVezanePonudeSelect").value = '';
+        let odbijenaPonudaRadio = document.querySelectorAll('input[name="odbijenaPonuda"]');
+        odbijenaPonudaRadio.forEach(radio => radio.checked = false);
+    });
+}
+
 let putZahtjevButton = document.getElementById("putZahtjevButton");
 putZahtjevButton.onclick = function(){
     let idVezanogZahtjeva = document.getElementById("idVezanogZahtjevaSelect").value;
     let odobren = document.querySelector('input[name="odobrenZahtjev"]:checked')?.value === "true";
     let addToTekst = document.getElementById("addToTekst").value;
 
-    if(addToTekst == ''){
-        addToTekst = null;
-    }
-
-    if(!odobren && addToTekst == null){
+    if(!odobren && addToTekst == ''){
         odgovorNakonPost.innerHTML = `<h2>Potrebno je dodati tekst ukoliko se odbija zahtjev.</h2>`;
         odgovorNakonPost.style.display = 'block';
         return;
@@ -503,7 +502,6 @@ putZahtjevButton.onclick = function(){
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno izmijenjen zahtjev!</h2>';
             updateZahtjevi();
-            updateZahtjevInSviElementi(idVezanogZahtjeva);
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -511,43 +509,4 @@ putZahtjevButton.onclick = function(){
         let odobrenZahtjevRadio = document.querySelectorAll('input[name="odobrenZahtjev"]');
         odobrenZahtjevRadio.forEach(radio => radio.checked = false);
     });
-}
-
-function updateZahtjevInSviElementi(idVezanogZahtjeva){
-    PoziviAjax.getZahtjevById(idVezanogZahtjeva, function(err, el){
-        if(err){
-            console.log(err);
-        }
-        else{
-            let zahtjev = sviElementi.find(el => el.id == "Z" + toString(idVezanogZahtjeva));
-
-            let htmlContent = '';
-            htmlContent += `
-                <p><strong>Id zahtjeva: ${el.id}</strong></p>
-                <p>${el.tekst}</p>
-            `;
-
-            let trazeni_datum = new Date(el.trazeniDatum);
-            let formatiranDatum = `${trazeni_datum.getDate().toString().padStart(2, '0')}.${(trazeni_datum.getMonth() + 1)
-                .toString().padStart(2, '0')}.${trazeni_datum.getFullYear()}.`
-
-            htmlContent += `
-                <p><strong>Datum:</strong> ${formatiranDatum}</p>
-            `;
-            if(el.odobren == "true"){
-                htmlContent += `
-                    <p><strong>Status:</strong> odobren</p>
-                `;
-            }
-            else{
-                htmlContent += `
-                    <p><strong>Status:</strong> odbijen</p>
-                `;
-            }
-
-            zahtjev.innerHTML = htmlContent;
-        }
-    });
-
-    
 }

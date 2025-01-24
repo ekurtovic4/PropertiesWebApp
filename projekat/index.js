@@ -592,8 +592,16 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
         novaPonuda.vezana_ponuda_id = ponudaZaKojuJeVezana.id;
 
         if(ponuda.odbijenaPonuda){
+          //odbija se korijenska
           ponudaZaKojuJeVezana.odbijenaPonuda = true;
           await ponudaZaKojuJeVezana.save();
+
+          //odbijaju se sve u lancu
+          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: ponudaZaKojuJeVezana.id} });
+          for(let vp of vezanePonude){
+            vp.odbijenaPonuda = true;
+            await vp.save();
+          }
         }
       }
       else{
@@ -610,8 +618,16 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
         novaPonuda.vezana_ponuda_id = korijenskaPonuda.id;
 
         if(ponuda.odbijenaPonuda){
+          //odbija se korijenska
           korijenskaPonuda.odbijenaPonuda = true;
           await korijenskaPonuda.save();
+
+          //odbijaju se sve u lancu
+          let vezanePonude = await baza.ponuda.findAll({ where: {vezana_ponuda_id: korijenskaPonuda.id} });
+          for(let vp of vezanePonude){
+            vp.odbijenaPonuda = true;
+            await vp.save();
+          }
         }
       }
     }
@@ -808,19 +824,6 @@ app.get('/nekretnina/:id/zahtjevi', async(req, res) => {
     else{
       return res.status(200).json(zahtjevi);
     }
-  }
-  catch (error) {
-    console.error('Error fetching user data:', error);
-    res.status(500).json({ greska: 'Internal Server Error' });
-  }
-});
-
-app.get('/zahtjev/:zid', async(req, res) => {
-  const { zid } = req.params;
-
-  try{
-    let zahtjev = await baza.zahtjev.findOne({ where: {id: zid} });
-    res.status(200).json(zahtjev);
   }
   catch (error) {
     console.error('Error fetching user data:', error);
