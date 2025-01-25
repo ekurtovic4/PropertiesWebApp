@@ -22,9 +22,14 @@ module.exports = function (sequelize, DataTypes) {
             }
             return await Ponuda.findAll({
                 where: {
-                    [Sequelize.Op.and]: [
-                        {vezana_ponuda_id: this.vezana_ponuda_id}, 
-                        {id: {[Sequelize.Op.ne]: this.id}}
+                    [Sequelize.Op.or]: [
+                        {
+                            [Sequelize.Op.and]: [
+                                {vezana_ponuda_id: this.vezana_ponuda_id}, 
+                                {id: {[Sequelize.Op.ne]: this.id}}
+                            ]
+                        },
+                        {id: this.vezana_ponuda_id}
                     ]
                 }
             });

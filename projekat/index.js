@@ -584,7 +584,7 @@ app.post('/nekretnina/:id/ponuda', async(req, res) => {
       }
 
       if(ponudaZaKojuJeVezana.vezana_ponuda_id == null){
-        if(!korisnik.admin){
+        if(!korisnik.admin && ponudaZaKojuJeVezana.korisnik_id != korisnik.id){
           return res.status(401).json({ greska: 'Neautorizovan pristup' });
         }
 
@@ -705,6 +705,10 @@ app.put('/nekretnina/:id/zahtjev/:zid', async(req, res) => {
       return res.status(400).json({ greska: 'Potrebno je proslijediti neki tekst ukoliko zahtjev nije odobren' });
     }
 
+    if(odgovor.addToTekst == null){
+      odgovor.addToTekst = '';
+    }
+
     zahtjev.odobren = odgovor.odobren;
     zahtjev.tekst = zahtjev.tekst.concat(" ODGOVOR ADMINA: ", odgovor.addToTekst);
     await zahtjev.save();
@@ -752,7 +756,6 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
     const korisnik = await baza.korisnik.findOne({ where: {username: req.session.username} });
 
     let ponude = [];
-    let ponudePlusVezane = [];
 
     if(korisnik.admin){
       ponude = await baza.ponuda.findAll({
@@ -769,8 +772,6 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
           ]
         }
       });
-
-      ponudePlusVezane = [...ponude];
     }
     else{
       ponude = await baza.ponuda.findAll({
@@ -794,6 +795,8 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
       return res.status(404).json({ poruka: 'Korisnik nema ranijih ponuda za ovu nekretninu' });
     }
 
+    let ponudePlusVezane = [...ponude];
+
     for(let p of ponude){
       let vezane = await baza.ponuda.findAll({
         where: {
@@ -805,10 +808,6 @@ app.get('/nekretnina/:id/ponude/korisnik', async(req, res) => {
       });
 
       ponudePlusVezane.push(...vezane);
-    }
-
-    if(ponudePlusVezane.length == 0){
-      return res.status(404).json({ poruka: 'Korisnik nema ranijih ponuda za ovu nekretninu' });
     }
     
     res.status(200).json(ponudePlusVezane);
