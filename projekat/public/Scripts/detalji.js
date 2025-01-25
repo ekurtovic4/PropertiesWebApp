@@ -3,7 +3,6 @@ let sviElementi = [];
 let idNekretnine = 0; 
 let korisnik = null;
 let first = true;
-let interesovanja = [];
 
 window.onload = async function() {
     let params = new URLSearchParams(window.location.search);
@@ -114,8 +113,12 @@ window.onload = async function() {
 }
 
 async function carousel(direction){
-    let glavniElement = document.getElementById("upiti");
     let brojElemenata = sviElementi.length;
+    if(brojElemenata == 0){
+        return;
+    }
+
+    let glavniElement = document.getElementById("upiti");
     let carouselFunkcija = postaviCarousel(glavniElement, sviElementi, indeks);
 
     if(direction == "left"){
@@ -130,25 +133,31 @@ async function carousel(direction){
 
 function setInteresovanja(){
     let glavniElement = document.getElementById("upiti");
-    let prvoInteresovanje = sviElementi[0];
     let htmlContent = '';
 
-    if(prvoInteresovanje.classList.contains('upit')){
-        htmlContent += "<div class=\"upit\">";
-        htmlContent += prvoInteresovanje.innerHTML;
-        htmlContent += "</div>";
-    }
-    else if(prvoInteresovanje.classList.contains('ponuda')){
-        htmlContent += "<div class=\"ponuda\">";
-        htmlContent += prvoInteresovanje.innerHTML;
-        htmlContent += "</div>";
+    if(sviElementi.length == 0){
+        htmlContent += "<p>Nema dostupnih interesovanja za ovu nekretninu.</p>";
     }
     else{
-        htmlContent += "<div class=\"zahtjev\">";
-        htmlContent += prvoInteresovanje.innerHTML;
-        htmlContent += "</div>";
+        let prvoInteresovanje = sviElementi[0];
+    
+        if(prvoInteresovanje.classList.contains('upit')){
+            htmlContent += "<div class=\"upit\">";
+            htmlContent += prvoInteresovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else if(prvoInteresovanje.classList.contains('ponuda')){
+            htmlContent += "<div class=\"ponuda\">";
+            htmlContent += prvoInteresovanje.innerHTML;
+            htmlContent += "</div>";
+        }
+        else{
+            htmlContent += "<div class=\"zahtjev\">";
+            htmlContent += prvoInteresovanje.innerHTML;
+            htmlContent += "</div>";
+        }
     }
-
+    
     glavniElement.innerHTML = htmlContent;
 }
 
@@ -158,8 +167,6 @@ function getInteresovanja() {
             console.log(error);
         }
         else{
-            interesovanja = data;
-
             for(el of data){
                 let upitDiv = document.createElement('div');
                 let htmlContent = '';
@@ -506,7 +513,6 @@ postPonudaButton.onclick = function(){
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>';
             updatePonude();
-            //getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
