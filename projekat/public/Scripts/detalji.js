@@ -167,6 +167,8 @@ function getInteresovanja() {
             console.log(error);
         }
         else{
+            sviElementi.length = 0;
+
             for(el of data){
                 let upitDiv = document.createElement('div');
                 let htmlContent = '';
@@ -246,7 +248,7 @@ function getInteresovanja() {
                 upitDiv.innerHTML = htmlContent;
                 sviElementi.push(upitDiv);
             }
-            if(first){
+            if(first || sviElementi.length == 1){
                 setInteresovanja();
                 first = false;
             }
@@ -451,6 +453,7 @@ postUpitButton.onclick = function(){
         }
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno postavljen upit!</h2>';
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -476,6 +479,7 @@ postZahtjevButton.onclick = function(){
         }
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno poslan zahtjev!</h2>';
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -513,6 +517,7 @@ postPonudaButton.onclick = function(){
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno poslana ponuda!</h2>';
             updatePonude();
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';
@@ -544,6 +549,7 @@ putZahtjevButton.onclick = function(){
         else{
             odgovorNakonPost.innerHTML = '<h2>Uspješno izmijenjen zahtjev!</h2>';
             updateZahtjevi();
+            getInteresovanja();
         }
 
         odgovorNakonPost.style.display = 'block';

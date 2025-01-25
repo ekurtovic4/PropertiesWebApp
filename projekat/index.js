@@ -58,7 +58,7 @@ routes.forEach(({ route, file }) => {
 /* ----------- SERVING OTHER ROUTES --------------- */
 
 // Async function for reading json data from data folder 
-/*async function readJsonFile(filename) {
+async function readJsonFile(filename) {
   const filePath = path.join(__dirname, 'data', `${filename}.json`);
   try {
     const rawdata = await fs.readFile(filePath, 'utf-8');
@@ -76,7 +76,7 @@ async function saveJsonFile(filename, data) {
   } catch (error) {
     throw error;
   }
-}*/
+}
 
 /*
 Checks if the user exists and if the password is correct based on korisnici.json data. 
@@ -318,7 +318,7 @@ app.get('/nekretnine', async (req, res) => {
 /* ----------------- MARKETING ROUTES ----------------- */
 
 // Route that increments value of pretrage for one based on list of ids in nizNekretnina
-/*app.post('/marketing/nekretnine', async (req, res) => {
+app.post('/marketing/nekretnine', async (req, res) => {
   const { nizNekretnina } = req.body;
 
   try {
@@ -422,7 +422,6 @@ app.post('/marketing/osvjezi/klikovi', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-*/
 
 app.get('/nekretnine/top5', async (req, res) => {
   let lokacija = req.query.lokacija;
