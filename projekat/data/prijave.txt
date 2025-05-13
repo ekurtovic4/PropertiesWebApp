@@ -210,3 +210,4 @@
 [Sat Jan 25 2025 19:23:52 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
 [Sat Jan 25 2025 19:28:14 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: noviKorisnik - status: uspješno
 [Sat Jan 25 2025 19:29:37 GMT+0100 (Centralnoevropsko standardno vrijeme)] - username: drugiKorisnik - status: uspješno
+[Fri Apr 04 2025 15:35:16 GMT+0200 (Centralnoevropsko ljetno vrijeme)] - username: prvikorisnik - status: uspješno

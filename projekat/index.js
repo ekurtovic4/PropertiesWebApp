@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 3000;
 
-const baza = require('./database/baza');
+const { baza, addNekretnine, addKorisnici } = require('./database/baza');
 const { Sequelize } = require('sequelize');
 
 app.use(session({
@@ -91,7 +91,7 @@ app.post('/login', async (req, res) => {
 
     if(locked > Date.now()){
       let newLine = `[${new Date()}] - username: ${jsonObj.username} - status: neuspješno`;
-      await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), newLine + '\r\n');
+      //await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), newLine + '\r\n');
       return res.status(429).json({ greska: 'Previse neuspjesnih pokusaja. Pokusajte ponovo za 1 minutu' });
     }
     else{
@@ -129,14 +129,14 @@ app.post('/login', async (req, res) => {
       failedLogins = 0;
       req.session.failedLogins = failedLogins;
       loginLine += 'uspješno';
-      await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), loginLine + '\r\n');
+      //await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), loginLine + '\r\n');
       res.json({ poruka: 'Uspješna prijava' });
     } 
     else {
       failedLogins += 1;
       req.session.failedLogins = failedLogins;
       loginLine += 'neuspješno';
-      await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), loginLine + '\r\n');
+      //await fs.appendFile(path.join(__dirname, 'data', 'prijave.txt'), loginLine + '\r\n');
 
       if(failedLogins >= 3){
         req.session.locked = Date.now() + 60000;
@@ -849,7 +849,9 @@ app.get('/nekretnina/:id/zahtjevi', async(req, res) => {
 // Start server
 async function startServer() {
   try {
-    await baza.sequelize.sync({ force: false });
+    await baza.sequelize.sync({ force: true });
+    await addNekretnine();
+    await addKorisnici();
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
