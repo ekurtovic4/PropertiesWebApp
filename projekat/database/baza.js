@@ -6,7 +6,7 @@ const upit = require('./upit');
 const zahtjev = require('./zahtjev');
 
 const sequelize = new Sequelize("wt24", "root", "password", {
-   host: "mysql-db",
+   host: "10.0.139.204",
    dialect: "mysql",
    port: '3306',
    logging: false,
